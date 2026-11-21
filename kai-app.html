@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0f0f0f">
+<title>K-AI</title>
+<link rel="manifest" href="manifest.json">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
+body{background:#0f0f0f;color:#fff;display:flex;height:100vh;overflow:hidden}
+#menu{width:290px;background:#171717;position:fixed;left:-300px;top:0;bottom:0;z-index:10;transition:.3s;padding:15px;overflow:auto}
+#menu.open{left:0}
+#menu b{font-size:19px}
+#menu button{background:#222;color:#fff;border:0;padding:11px;border-radius:10px;text-align:left;width:100%;margin-top:8px;cursor:pointer}
+#menu h4{font-size:11px;color:#888;margin-top:14px;text-transform:uppercase}
+#menu small{color:#aaa;font-size:12px;line-height:1.5;display:block;margin-top:12px}
+#overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;z-index:5}
+#overlay.show{display:block}
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.top{padding:13px 15px;border-bottom:1px solid #222;display:flex;gap:12px;align-items:center}
+.top button{background:#222;color:#fff;border:0;padding:9px 12px;border-radius:10px;font-size:18px}
+.top span{color:#4ade80;font-size:12px;margin-left:auto}
+.chat{flex:1;padding:15px;overflow:auto}
+.msg{background:#1e1e1e;padding:13px;border-radius:12px;margin-bottom:10px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+.msg img{width:100%;border-radius:12px;margin-top:10px}
+.bottom{padding:12px;border-top:1px solid #222;display:flex;gap:10px;background:#0f0f0f}
+.bottom input{flex:1;padding:14px;border-radius:22px;border:0;background:#222;color:#fff;outline:none;font-size:15px}
+.bottom button{padding:12px 18px;border-radius:22px;border:0;background:#fff;color:#000;font-weight:bold;font-size:18px}
+.tree{font-family:monospace;font-size:12px;color:#ccc;white-space:pre-wrap;line-height:1.6;background:#111;padding:10px;border-radius:10px;margin-top:8px}
+.brain{font-size:12px;color:#a5f3fc;background:#0e1a1a;padding:10px;border-radius:10px;margin-top:8px;line-height:1.6}
+</style>
+</head>
+<body>
+<div id="overlay" onclick="toggleMenu()"></div>
+<div id="menu">
+<b>⚡ K-AI</b>
+<button onclick="toggleMenu();pedir('Cria um app de treino')">➕ Novo Projeto</button>
+<button onclick="toggleMenu();pedir('Cria uma landing page')">🎨 Design</button>
+<button onclick="instalar()">⬇️ Instalar App</button>
+<h4>🧠 Cérebro K-AI</h4>
+<div id="brainInfo" class="brain">Carregando cérebro...</div>
+<h4>📁 Estrutura Raiz - GitHub</h4>
+<div id="arvore" class="tree">Carregando...</div>
+<h4>📱 Meus Apps</h4>
+<div id="listaApps"></div>
+<small id="status">Conectando...</small>
+<small>K-AI FUSÃO ÚNICA<br>Gemini + Groq + Pollinations<br>Chaves no Supabase Secrets<br>GEMINI_API_KEY + GROQ_SUPABASE_KEY<br>Auto-evolução ativa</small>
+</div>
+<div class="main">
+<div class="top"><button onclick="toggleMenu()">☰</button><b>K-AI - App Mãe</b><span>● FUSÃO + CÉREBRO ATIVO</span></div>
+<div class="chat" id="chat"></div>
+<div class="bottom"><input id="txt" placeholder="Pede pro K-AI criar, editar ou evoluir..."><button onclick="enviar()">➤</button></div>
+</div>
+<script>
+const SUPABASE_URL="https://tgccyqvobdmwmwjwntxx.supabase.co";
+const SUPABASE_KEY="sb_publishable_2EneNKkowoLF9UiWwB1DDA_Z_RvwPfX";
+const GITHUB_REPO="korvil-app/k-ai-app";
+const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let deferredPrompt, BRAIN=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;});
+function instalar(){ if(deferredPrompt) deferredPrompt.prompt(); else alert('Chrome: 3 pontinhos > Adicionar à tela inicial'); }
+if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js'); }
+function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); document.getElementById('overlay').classList.toggle('show'); }
+async function carregarCerebro(){
+  try{
+    const r=await fetch('https://raw.githubusercontent.com/'+GITHUB_REPO+'/main/brain/memoria.json');
+    BRAIN=await r.json();
+    document.getElementById('brainInfo').innerHTML='🧠 <b>'+BRAIN.nome+'</b><br>Versão: '+BRAIN.versao+'<br>Memórias: '+BRAIN.memorias.length+'<br>Personalidade: '+BRAIN.personalidade+'<br>Última evolução: '+BRAIN.ultima_evolucao;
+  }catch(e){ document.getElementById('brainInfo').innerText='🧠 Cérebro v1 ativo'; }
+}
+async function carregarEstrutura(){
+  try{
+    const res=await fetch('https://api.github.com/repos/'+GITHUB_REPO+'/git/trees/main?recursive=1');
+    const data=await res.json();
+    if(!data.tree) return;
+    let txt='k-ai-app/\n';
+    data.tree.filter(f=>!f.path.includes('.git')).slice(0,80).forEach(f=>{ txt+='  '+(f.type==='tree'?'📁 ':'📄 ')+f.path+'\n'; });
+    document.getElementById('arvore').innerText=txt;
+    let box=document.getElementById('listaApps'); box.innerHTML='';
+    let apps=data.tree.filter(f=>f.path.startsWith('apps/') && f.type==='tree');
+    if(apps.length===0) box.innerHTML='<button>+ Nenhum app ainda</button>';
+    apps.forEach(a=>{ let nome=a.path.replace('apps/',''); if(nome && !nome.includes('/')) box.innerHTML+='<button onclick="window.open(\'https://korvil-app.github.io/k-ai-app/apps/'+nome+'/\',\'_blank\')">📱 '+nome+'</button>'; });
+  }catch(e){}
+}
+function pedir(t){ document.getElementById('txt').value=t; enviar(); }
+async function salvar(role,message){ await supabaseClient.from('k_ai_chats').insert({role,message}); }
+async function carregar(){
+  const {data}=await supabaseClient.from('k_ai_chats').select('*').order('created_at',{ascending:true}).limit(60);
+  let c=document.getElementById('chat');
+  if(!data||data.length===0){ c.innerHTML='<div class="msg"><b>K-AI ⚡:</b> Sou 1 única IA evoluída: Gemini + Groq + Pollinations juntas. Meu cérebro tem memória, funções e inteligência. Tudo que você pedir, eu crio, salvo no Supabase e evoluo sozinho. O que vamos criar?</div>'; return; }
+  c.innerHTML=''; data.forEach(m=>{ c.innerHTML+='<div class="msg"><b>'+(m.role==='user'?'Você':'K-AI ⚡')+':</b> '+m.message+'</div>'; });
+  c.scrollTop=c.scrollHeight;
+}
+async function enviar(){
+  let v=document.getElementById('txt').value.trim(); if(!v) return;
+  let c=document.getElementById('chat');
+  c.innerHTML+='<div class="msg"><b>Você:</b> '+v+'</div>';
+  await salvar('user',v);
+  document.getElementById('txt').value='';
+  c.innerHTML+='<div class="msg" id="loading"><b>K-AI FUSÃO + CÉREBRO:</b> Gemini + Groq + Pollinations + Memória pensando como 1 só...</div>';
+  c.scrollTop=c.scrollHeight;
+  try{
+    const res=await fetch(SUPABASE_URL+"/functions/v1/k-ai",{method:"POST",headers:{"Authorization":"Bearer "+SUPABASE_KEY,"Content-Type":"application/json"},body:JSON.stringify({prompt:v, cerebro:BRAIN, contexto:"Você é 1 única IA fusão Gemini+Groq+Pollinations com cérebro com memória. Não separe por IA. Responda como 1 só, máximo qualidade. Se criar app, caminho: apps/nome-do-app/index.html. Nunca duplique arquivos, atualize os existentes."})});
+    const data=await res.json();
+    document.getElementById('loading')?.remove();
+    let html='<div class="msg"><b>K-AI ⚡:</b> '+(data.resposta||"Sem resposta").replace(/\n/g,'<br>')+'</div>';
+    if(data.imagem) html+='<div class="msg"><b>K-AI Imagem:</b><br><img src="'+data.imagem+'"></div>';
+    c.innerHTML+=html;
+    await salvar('assistant',data.resposta||"");
+    carregarEstrutura();
+  }catch(e){ document.getElementById('loading')?.remove(); c.innerHTML+='<div class="msg"><b>K-AI:</b> Erro na fusão. Confere Deploy da função k-ai.</div>'; }
+  c.scrollTop=c.scrollHeight;
+}
+document.getElementById('txt').addEventListener('keydown',e=>{if(e.key==='Enter') enviar();});
+carregar(); carregarCerebro(); carregarEstrutura();
+</script>
+</body>
+</html>
