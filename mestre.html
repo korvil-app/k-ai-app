@@ -1,107 +1,108 @@
-<!-- g.hp_ix7nVkpOozhBWkZ6NdIeQGMdRBhymb1wohuX -->
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#000000">
-<title>K-AI</title>
-<link rel="manifest" href="manifest.json">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
-body{background:#000;color:#fff;display:flex;height:100vh;overflow:hidden}
-@keyframes pulse{0%,100%{box-shadow:0 0 10px #00e5ff,0 0 20px #00e5ff}50%{box-shadow:0 0 25px #00e5ff,0 0 45px #00e5ff}}
-#menu{width:290px;background:#050a0c;position:fixed;left:-300px;top:0;bottom:0;z-index:10;transition:.3s;padding:15px;overflow:auto;border-right:2px solid #00e5ff;animation:pulse 2.5s infinite}
-#menu.open{left:0}
-#menu b{font-size:20px;color:#00e5ff;text-shadow:0 0 10px #00e5ff}
-#menu button{background:#0a1a20;color:#fff;border:1px solid #00e5ff33;padding:11px;border-radius:12px;text-align:left;width:100%;margin-top:8px;cursor:pointer}
-#menu h4{font-size:11px;color:#00e5ff;margin-top:14px;text-transform:uppercase}
-#menu small{color:#aaa;font-size:12px;line-height:1.5;display:block;margin-top:12px}
-#overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;z-index:5}
-#overlay.show{display:block}
-.main{flex:1;display:flex;flex-direction:column;min-width:0}
-.top{padding:13px 15px;border-bottom:2px solid #00e5ff;display:flex;gap:12px;align-items:center;background:#000}
-.top button{background:#0a1a20;color:#00e5ff;border:1px solid #00e5ff;padding:9px 12px;border-radius:10px;font-size:18px;animation:pulse 2.5s infinite}
-.top span{color:#00e5ff;font-size:12px;margin-left:auto;text-shadow:0 0 8px #00e5ff}
-.chat{flex:1;padding:15px;overflow:auto;background:radial-gradient(circle at 50% 0%, #001a22 0%, #000 60%)}
-.msg{background:#0a1a20;padding:13px;border-radius:14px;margin-bottom:10px;line-height:1.6;white-space:pre-wrap;word-break:break-word;border:1px solid #00e5ff33}
-.msg img{width:100%;border-radius:12px;margin-top:10px;border:1px solid #00e5ff}
-.bottom{padding:12px;border-top:2px solid #00e5ff;display:flex;gap:10px;background:#000}
-.bottom input{flex:1;padding:14px;border-radius:22px;border:1px solid #00e5ff;background:#0a1a20;color:#fff;outline:none;font-size:15px}
-.bottom button{padding:12px 18px;border-radius:22px;border:0;background:#00e5ff;color:#000;font-weight:bold;font-size:18px;box-shadow:0 0 20px #00e5ff}
-.tree{font-family:monospace;font-size:12px;color:#a5f3fc;white-space:pre-wrap;line-height:1.6;background:#031014;padding:10px;border-radius:10px;margin-top:8px;border:1px solid #00e5ff33}
-.brain{font-size:12px;color:#a5f3fc;background:#031014;padding:10px;border-radius:10px;margin-top:8px;line-height:1.6;border:1px solid #00e5ff33}
-</style>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>K-AI MESTRE</title>
+<style>body{background:#020617;color:#fff;font-family:Arial;padding:16px}label{font-size:13px;color:#94a3b8}input{width:100%;padding:14px;background:#1e293b;border:1px solid #334155;color:#fff;border-radius:10px;margin:8px 0}button{background:#00e5ff;color:#000;border:none;padding:16px;border-radius:12px;font-weight:900;width:100%;font-size:16px;cursor:pointer}pre{background:#0f172a;padding:12px;border-radius:12px;white-space:pre-wrap;word-break:break-word;font-size:12px;max-height:500px;overflow:auto}.ok{color:#22c55e}</style>
 </head>
 <body>
-<div id="overlay" onclick="toggleMenu()"></div>
-<div id="menu">
-<b>⚡ K-AI</b>
-<button onclick="toggleMenu();pedir('Cria um app de treino')">➕ Novo Projeto</button>
-<button onclick="toggleMenu();pedir('Cria uma landing page neon')">🎨 Design</button>
-<button onclick="instalar()">⬇️ Instalar App</button>
-<h4>🧠 Cérebro K-AI</h4>
-<div id="brainInfo" class="brain">Carregando cérebro...</div>
-<h4>📁 Estrutura Raiz - GitHub</h4>
-<div id="arvore" class="tree">Carregando...</div>
-<h4>📱 Meus Apps</h4>
-<div id="listaApps"></div>
-<small id="status">Conectando...</small>
-<small>K-AI FUSÃO REAL<br>Gemini + Groq + Pollinations<br>1 IA só, tempo real<br>Supabase + GitHub</small>
-</div>
-<div class="main">
-<div class="top"><button onclick="toggleMenu()">☰</button><b>K-AI - App Mãe</b><span>● FUSÃO + CÉREBRO ATIVO</span></div>
-<div class="chat" id="chat"></div>
-<div class="bottom"><input id="txt" placeholder="Pede pro K-AI criar, editar ou evoluir..."><button onclick="enviar()">➤</button></div>
-</div>
+<h2>⚡ K-AI MESTRE</h2>
+<p>ENVIAR = Atualiza o que já tem sem excluir nada + Cria o que falta da função comando de voz.</p>
+<label>KAI_TOKEN (GitHub PAT com repo):</label>
+<input id="KAI_TOKEN" type="password" placeholder="ghp_...">
+<label>Repo:</label>
+<input id="repo" value="korvil-app/k-ai-app">
+<button onclick="enviarMestre()">🚀 ENVIAR - ATUALIZAR TUDO</button>
+<pre id="log">Aguardando KAI_TOKEN...</pre>
 <script>
-const SUPABASE_URL="https://tgccyqvobdmwmwjwntxx.supabase.co";
-const SUPABASE_KEY="sb_publishable_2EneNKkowoLF9UiWwB1DDA_Z_RvwPfX";
-const GITHUB_REPO="korvil-app/k-ai-app";
-const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-let deferredPrompt, BRAIN=null;
-window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;});
-function instalar(){ if(deferredPrompt) deferredPrompt.prompt(); else alert('Chrome: 3 pontinhos > Adicionar à tela inicial'); }
-if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js'); }
-function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); document.getElementById('overlay').classList.toggle('show'); }
-async function carregarCerebro(){
-  try{ const r=await fetch('https://raw.githubusercontent.com/'+GITHUB_REPO+'/main/brain/memoria.json'); BRAIN=await r.json(); document.getElementById('brainInfo').innerHTML='🧠 <b>'+BRAIN.nome+'</b><br>Versão: '+BRAIN.versao+'<br>Memórias: '+BRAIN.memorias.length+'<br>'+BRAIN.personalidade; }catch(e){ document.getElementById('brainInfo').innerText='🧠 Cérebro v2 ativo'; }
+const logEl=document.getElementById('log');
+function log(t){ logEl.innerHTML+='\n'+t; logEl.scrollTop=99999; }
+function b64(s){ return btoa(unescape(encodeURIComponent(s))); }
+
+const FILES = {
+
+// ========== KAI-APP ATUALIZADO - SEM EXCLUIR, SÓ ADICIONA VOZ ==========
+"kai-app.html": `<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>K-AI</title>
+<style>*{box-sizing:border-box;margin:0;padding:0}body{background:#020617;color:#e2e8f0;font-family:Arial;height:100dvh;display:flex;overflow:hidden}#menu{width:210px;background:#000;border-right:2px solid #00e5ff;display:flex;flex-direction:column;padding:14px 10px;gap:8px;flex-shrink:0}.mbtn{background:#0f172a;border:1px solid #1e293b;color:#fff;padding:14px;border-radius:12px;text-align:left;cursor:pointer;font-weight:700}.mbtn.active{background:#00e5ff;color:#000}#main{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative}header{background:#000;padding:14px;border-bottom:1px solid #1e293b;display:flex;justify-content:space-between}.view{flex:1;overflow-y:auto;padding:14px;padding-bottom:170px;display:none}.view.active{display:block}.card{background:#0f172a;border:1px solid #1e293b;border-radius:14px;padding:14px;margin-bottom:12px}.msg{background:#0f172a;border:1px solid #1e293b;border-radius:14px;padding:14px;line-height:1.6;white-space:pre-wrap;margin-bottom:12px}.msg.me{background:#082f49;border-color:#00e5ff}#statusVoz{text-align:center;font-size:13px;padding:8px;color:#facc15;min-height:22px;font-weight:700}#statusVoz.ouvindo{color:#22c55e}#statusVoz.pergunta{color:#facc15;background:#422006;padding:10px;border-radius:10px}#box{position:absolute;bottom:0;left:0;right:0;background:#000;padding:12px;display:none;gap:8px;border-top:2px solid #00e5ff;align-items:center}#box.show{display:flex}#input{flex:1;background:#1e293b;border:1px solid #334155;color:#fff;padding:14px;border-radius:25px;font-size:16px;outline:none}#btnMic{background:#1e293b;border:2px solid #334155;color:#fff;width:56px;height:56px;border-radius:50%;font-size:24px;cursor:pointer;flex-shrink:0}#btnMic.on{background:#ef4444;border-color:#ef4444;animation:p 1s infinite}@keyframes p{0%{transform:scale(1)}50%{transform:scale(1.12)}100%{transform:scale(1)}}#btnSend{background:#00e5ff;color:#000;border:none;padding:0 22px;border-radius:25px;font-weight:900;font-size:16px;height:52px}.btn{background:#00e5ff;color:#000;border:none;padding:10px 14px;border-radius:10px;font-weight:900;cursor:pointer;margin:4px}.btn2{background:#1e293b;color:#fff;border:1px solid #334155;padding:10px;border-radius:10px;cursor:pointer;margin:4px}@media(max-width:700px){#menu{width:64px}.mbtn{font-size:20px;text-align:center}}</style></head>
+<body><div id="menu"><b>K-AI ⚡</b><button class="mbtn active" onclick="show('kai',this)">🤖 K-AI</button><button class="mbtn" onclick="show('supa',this)">🟢 SUPABASE</button><button class="mbtn" onclick="show('git',this)">⚫ GITHUB</button><button class="mbtn" onclick="window.open('https://supabase.com/dashboard/project/tgccyqvobdmwmwjwntxx','_blank')">↗ Supabase Oficial</button><button class="mbtn" onclick="window.open('https://github.com/korvil-app/k-ai-app','_blank')">↗ GitHub Oficial</button></div>
+<div id="main"><header><b id="title">K-AI - App Mãe</b><span>● VOZ ATIVA</span></header>
+<div id="view-kai" class="view active"><div id="chat"><div class="msg"><b>K-AI ⚡:</b> Aperta 🎤 1x e fala. Digito tudo em tempo real. Parou 2s eu pergunto se terminou. Falou entre 2s-4s eu continuo. 5s sem falar eu desligo sozinho e envio.</div></div></div>
+<div id="view-supa" class="view"><div class="card"><h3>🟢 SUPABASE</h3><p>Fale: "Cria tabela treinos no Supabase"</p><button class="btn" onclick="window.open('https://supabase.com/dashboard/project/tgccyqvobdmwmwjwntxx','_blank')">Abrir Oficial ↗</button></div></div>
+<div id="view-git" class="view"><div class="card"><h3>⚫ GITHUB</h3><p>Fale: "Cria arquivo treino.html no GitHub"</p><button class="btn" onclick="window.open('https://github.com/korvil-app/k-ai-app','_blank')">Abrir Oficial ↗</button></div></div>
+<div id="statusVoz">🎤 Toque 1x no microfone e fale</div>
+<div id="box" class="show"><button id="btnMic" onclick="toggleMic()" title="Ativar comando de voz">🎤</button><input id="input" placeholder="Digite ou fale..."><button id="btnSend" onclick="enviar()">➤</button></div></div>
+<script src="funcoes/co-de-voz/voz.js"><\/script>
+<script>
+const SUPABASE_URL="https://tgccyqvobdmwmwjwntxx.supabase.co";const SUPABASE_ANON="sb_publishable_2EneNKkowoLF9UiWwB1DDA_Z_RvwPfX";
+const chat=document.getElementById('chat'),input=document.getElementById('input');
+function show(v,btn){document.querySelectorAll('.mbtn').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));document.getElementById('view-'+v).classList.add('active');document.getElementById('box').classList.toggle('show',v==='kai');}
+function addMsg(t,me=false){const d=document.createElement('div');d.className='msg'+(me?' me':'');d.innerHTML=(me?'<b>Você:</b> ':'<b>K-AI ⚡:</b> ')+t.replace(/</g,'&lt;');chat.appendChild(d);chat.scrollTop=99999;return d;}
+async function enviar(){const texto=input.value.trim();if(!texto)return;input.value='';addMsg(texto,true);const load=addMsg('Fazendo...');try{const r=await fetch(SUPABASE_URL+'/functions/v1/k-ai',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SUPABASE_ANON,'apikey':SUPABASE_ANON},body:JSON.stringify({prompt:texto})});const j=await r.json();load.innerHTML='<b>K-AI ⚡:</b> '+(j.resposta||'Sem resposta').replace(/</g,'&lt;');if(j.imagem){const im=document.createElement('img');im.src=j.imagem;im.style.width='100%';im.style.borderRadius='12px';load.appendChild(im);}}catch(e){load.innerHTML='<b>K-AI ⚡:</b> Erro: '+e.message;}}
+input.addEventListener('keydown',e=>{if(e.key==='Enter')enviar();});
+<\/script></body></html>`,
+
+// ========== FUNÇÃO COMANDO DE VOZ ==========
+"funcoes/co-de-voz/voz.js": `// K-AI - COMANDO DE VOZ - BOTÃO LIGA 1x / DESLIGA SOZINHO EM 5s
+let rec=null, ouvindo=false, textoBase='', timer2s=null, timer5s=null, perguntou=false;
+const CORRECOES={'k ai':'K-AI','kai':'K-AI','supa base':'Supabase','github':'GitHub','gith hub':'GitHub'};
+function corrigirTexto(t){ let s=' '+t.toLowerCase()+' '; for(const [e,c] of Object.entries(CORRECOES)){ s=s.split(e).join(' '+c+' '); } s=s.replace(/\\s+/g,' ').trim(); if(!s) return s; return s.charAt(0).toUpperCase()+s.slice(1); }
+function toggleMic(){
+  if(ouvindo){ pararVoz(); return; }
+  if(!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)){ alert('Use Chrome no celular para a voz funcionar.'); return; }
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition; rec=new SR();
+  rec.lang='pt-BR'; rec.continuous=true; rec.interimResults=true; rec.maxAlternatives=1;
+  textoBase=document.getElementById('input').value; ouvindo=true; perguntou=false;
+  const btn=document.getElementById('btnMic'), st=document.getElementById('statusVoz');
+  btn.classList.add('on'); btn.innerText='🔴'; st.className='ouvindo'; st.innerText='● OUVINDO... fale agora - botão ativo';
+  rec.onresult=(e)=>{
+    let interim='';
+    for(let i=e.resultIndex;i<e.results.length;i++){ const r=e.results[i]; if(r.isFinal){ textoBase=(textoBase+' '+r[0].transcript).trim(); } else { interim+=r[0].transcript; } }
+    document.getElementById('input').value=corrigirTexto(textoBase+' '+interim);
+    perguntou=false;
+    const st2=document.getElementById('statusVoz'); st2.className='ouvindo'; st2.innerText='● Digitando em tempo real: "'+document.getElementById('input').value.substring(0,60)+'..."';
+    clearTimeout(timer2s); clearTimeout(timer5s);
+    timer2s=setTimeout(()=>{
+      if(!ouvindo) return; perguntou=true;
+      const st3=document.getElementById('statusVoz'); st3.className='pergunta'; st3.innerText='❓ Você já terminou? Posso fazer o que você falou? Continue falando se quiser.';
+      timer5s=setTimeout(()=>{ if(ouvindo && perguntou){ pararVoz(); if(document.getElementById('input').value.trim().length>2) enviar(); } }, 3000);
+    }, 2000);
+  };
+  rec.onend=()=>{ if(ouvindo){ try{rec.start();}catch(_){} } };
+  rec.onerror=(e)=>{ if(e.error==='not-allowed') alert('Permita o microfone no navegador.'); };
+  rec.start();
 }
-async function carregarEstrutura(){
-  try{ const res=await fetch('https://api.github.com/repos/'+GITHUB_REPO+'/git/trees/main?recursive=1'); const data=await res.json(); if(!data.tree) return; let txt='k-ai-app/\n'; data.tree.filter(f=>!f.path.includes('.git')).slice(0,80).forEach(f=>{ txt+='  '+(f.type==='tree'?'📁 ':'📄 ')+f.path+'\n'; }); document.getElementById('arvore').innerText=txt; let box=document.getElementById('listaApps'); box.innerHTML=''; let apps=data.tree.filter(f=>f.path.startsWith('apps/') && f.type==='tree'); if(apps.length===0) box.innerHTML='<button>+ Nenhum app ainda</button>'; apps.forEach(a=>{ let nome=a.path.replace('apps/',''); if(nome && !nome.includes('/')) box.innerHTML+='<button onclick="window.open(\'https://korvil-app.github.io/k-ai-app/apps/'+nome+'/\',\'_blank\')">📱 '+nome+'</button>'; }); }catch(e){}
+function pararVoz(){ ouvindo=false; clearTimeout(timer2s); clearTimeout(timer5s); const b=document.getElementById('btnMic'); if(b){ b.classList.remove('on'); b.innerText='🎤'; } const s=document.getElementById('statusVoz'); if(s){ s.className=''; s.innerText='🎤 Toque 1x no microfone para falar de novo'; } if(rec) try{rec.stop();}catch(_){} }
+`,
+
+"funcoes/co-de-voz/DESCRICAO-DA-FUNCAO.md": `# DESCRIÇÃO DA FUNÇÃO: COMANDO DE VOZ - K-AI APP\n\n## Objetivo\nFazer o K-AI funcionar também com comando de voz.\n\n## Como funciona\n1. Usuário clica 1x no botão 🎤 no chat do K-AI para ativar o comando de voz. O botão fica ativo enquanto ele estiver falando.\n2. Enquanto ele fala, o K-AI vai digitando na hora em tempo real no chat tudo exatamente como ele falar.\n3. Reconhece com máxima precisão cada palavra, cada letra, cada sentido das falas e pedidos.\n4. Nunca permite digitar palavras que não existem. Corrige na hora: ex: kai -> K-AI, github -> GitHub.\n5. Reconhece automaticamente, instantâneo e rápido em tempo real, todas as falas, palavras, cada letra, cada sentido, pedidos.\n6. Reconhece quando o usuário falar o que quer que ele faça.\n\n## Regra dos 2 segundos até 5 segundos\n- Se o usuário parar de falar por 2 segundos, o K-AI pergunta: "Você já terminou? Posso fazer o que você falou?"\n- Se o usuário falar alguma coisa entre 2, 3 ou 4 segundos, o K-AI digita rápido continuando o que ele falou antes de ficar 2 segundos sem falar, e continua digitando as falas seguintes.\n- Se o usuário não falar mais nada de 2 segundos até 5 segundos sem interrupção, quando der 5 segundos o botão desliga sozinho e o K-AI envia e faz o que foi pedido.\n- Para ativar de novo, basta clicar 1x no botão de novo.\n- O K-AI sempre digita de onde parou até as últimas falas que foram faladas antes de parar.\n\n## Outro modo\n- Se o usuário enviar os pedidos digitando no chat, também funciona certo, do mesmo jeito.\n\n## Microfone do celular\n- Funciona real no Chrome no celular, usando o microfone do celular. É preciso permitir o microfone no navegador.\n\n## Arquivos desta função\n- voz.js: código da função de voz\n- DESCRICAO-DA-FUNCAO.md: este arquivo, descreve o funcionamento\n`,
+
+"funcoes/co-de-voz/README.md": `# Função: Comando de Voz\n\nPasta: funcoes/co-de-voz/\nPrincipal: voz.js\nDescrição: DESCRICAO-DA-FUNCAO.md\nUsado em: kai-app.html\n`,
+
+// ========== OUTRAS FUNÇÕES - SÓ DESCRIÇÃO, SEM APAGAR NADA ==========
+"funcoes/k-ai/DESCRICAO-DA-FUNCAO.md": `# DESCRIÇÃO DA FUNÇÃO: K-AI\n\n## Objetivo\nK-AI é a IA única evoluída, fusão de Gemini + Groq + Pollinations.\n\n## Como funciona\n- Recebe prompt por texto digitado ou por voz.\n- Entende o pedido, cria textos, ideias, códigos, imagens.\n- Manda comandos para Supabase e GitHub.\n- Responde no chat em tempo real.\n`,
+"funcoes/k-admin/DESCRICAO-DA-FUNCAO.md": `# DESCRIÇÃO DA FUNÇÃO: K-ADMIN\n\n## Objetivo\nFazer a ponte entre K-AI e as contas oficiais de Supabase e GitHub.\n\n## Como funciona\n- Recebe ação do K-AI: criar tabela, rodar SQL, criar arquivo no GitHub, etc.\n- Executa de verdade nas APIs oficiais.\n- Devolve o resultado para mostrar na cópia dentro do app.\n- Guarda os tokens com segurança nos Secrets, nunca no HTML.\n`,
+"index.html": `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta http-equiv="refresh" content="0; url=kai-app.html"><title>K-AI</title></head><body style="background:#020617;color:#fff;font-family:Arial;padding:20px"><h1>K-AI carregando...</h1><a href="kai-app.html" style="color:#00e5ff">Clique aqui</a></body></html>`,
+};
+
+async function enviarMestre(){
+  const token=document.getElementById('KAI_TOKEN').value.trim();
+  const repo=document.getElementById('repo').value.trim();
+  if(!token) return alert('Cola seu KAI_TOKEN primeiro');
+  logEl.innerHTML='🚀 ENVIAR iniciado em '+repo+'...';
+  const [owner, repoName]=repo.split('/');
+  for(const [path, content] of Object.entries(FILES)){
+    try{
+      let sha=null;
+      const getRes=await fetch(`https://api.github.com/repos/${owner}/${repoName}/contents/${path}`,{headers:{Authorization:'Bearer '+token,Accept:'application/vnd.github+json'}});
+      if(getRes.ok){ const j=await getRes.json(); sha=j.sha; }
+      const putRes=await fetch(`https://api.github.com/repos/${owner}/${repoName}/contents/${path}`,{method:'PUT',headers:{Authorization:'Bearer '+token,Accept:'application/vnd.github+json','Content-Type':'application/json'},body:JSON.stringify({message: sha ? 'K-AI MESTRE: ajusta '+path+' sem excluir, adiciona voz' : 'K-AI MESTRE: cria '+path+' da função voz', content:b64(content), ...(sha?{sha}:{})})});
+      const pj=await putRes.json();
+      if(putRes.ok) log((sha?'🔄 ATUALIZADO SEM EXCLUIR: ':'✨ CRIADO: ')+path+' ✅');
+      else log('❌ ERRO '+path+': '+(pj.message||putRes.status));
+    }catch(e){ log('❌ ERRO '+path+': '+e.message); }
+  }
+  log('\n🏁 FIM! Abre o kai-app.html e testa a voz.');
 }
-function pedir(t){ document.getElementById('txt').value=t; enviar(); }
-async function salvar(role,message){ await supabaseClient.from('k_ai_chats').insert({role,message}); }
-async function salvarMemoria(conteudo){ await supabaseClient.from('k_ai_memoria').insert({conteudo, tipo:'aprendizado'}); }
-async function carregar(){
-  const {data,error}=await supabaseClient.from('k_ai_chats').select('*').order('created_at',{ascending:true}).limit(60);
-  let c=document.getElementById('chat');
-  if(error){ c.innerHTML='<div class="msg"><b>Sistema:</b> Erro Supabase: '+error.message+'<br>Cria a tabela k_ai_chats no SQL que te passei.</div>'; return; }
-  if(!data||data.length===0){ c.innerHTML='<div class="msg"><b>K-AI ⚡:</b> Sou 1 única IA evoluída: Gemini + Groq + Pollinations juntas, em tempo real. Meu cérebro tem memória e aprende a cada uso. Tudo que você pedir, eu crio, salvo e evoluo. O que vamos criar agora?</div>'; return; }
-  c.innerHTML=''; data.forEach(m=>{ c.innerHTML+='<div class="msg"><b>'+(m.role==='user'?'Você':'K-AI ⚡')+':</b> '+m.message+'</div>'; }); c.scrollTop=c.scrollHeight;
-}
-async function enviar(){
-  let v=document.getElementById('txt').value.trim(); if(!v) return;
-  let c=document.getElementById('chat');
-  c.innerHTML+='<div class="msg"><b>Você:</b> '+v+'</div>';
-  await salvar('user',v); await salvarMemoria('Usuário pediu: '+v);
-  document.getElementById('txt').value='';
-  c.innerHTML+='<div class="msg" id="loading"><b>K-AI FUSÃO:</b> Gemini + Groq + Pollinations pensando como 1 só em tempo real...</div>'; c.scrollTop=c.scrollHeight;
-  try{
-    const res=await fetch(SUPABASE_URL+"/functions/v1/k-ai",{method:"POST",headers:{"Authorization":"Bearer "+SUPABASE_KEY,"Content-Type":"application/json"},body:JSON.stringify({prompt:v, cerebro:BRAIN})});
-    const txt=await res.text();
-    let data={}; try{ data=JSON.parse(txt); }catch(e){ data={resposta:"Erro: a função retornou texto inválido: "+txt.slice(0,300)}; }
-    document.getElementById('loading')?.remove();
-    if(!res.ok){ c.innerHTML+='<div class="msg"><b>K-AI Erro real:</b> Status '+res.status+' - '+(data.resposta||txt.slice(0,300))+'<br><br>Isso significa que a função k-ai ainda não foi criada ou não foi feito Deploy. Faz o Passo 2 que te passei.</div>'; return; }
-    let html='<div class="msg"><b>K-AI ⚡:</b> '+(data.resposta||"Sem resposta da IA").replace(/\n/g,'<br>')+'</div>';
-    if(data.imagem) html+='<div class="msg"><b>K-AI Imagem:</b><br><img src="'+data.imagem+'"></div>';
-    c.innerHTML+=html; await salvar('assistant',data.resposta||""); await salvarMemoria('K-AI aprendeu: '+v.slice(0,200)); carregarEstrutura();
-  }catch(e){ document.getElementById('loading')?.remove(); c.innerHTML+='<div class="msg"><b>K-AI Erro:</b> '+e.message+'</div>'; }
-  c.scrollTop=c.scrollHeight;
-}
-document.getElementById('txt').addEventListener('keydown',e=>{if(e.key==='Enter') enviar();});
-carregar(); carregarCerebro(); carregarEstrutura();
 </script>
 </body>
 </html>
