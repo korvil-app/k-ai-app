@@ -1,7 +1,7 @@
 {
   "name": "K-AI",
   "short_name": "K-AI",
-  "start_url": ".",
+  "start_url": "kai-app.html",
   "display": "standalone",
   "background_color": "#0f0f0f",
   "theme_color": "#0f0f0f",
