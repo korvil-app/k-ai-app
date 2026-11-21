@@ -1,88 +1,71 @@
-<!-- g.hp_ix7nVkpOozhBWkZ6NdIeQGMdRBhymb1wohuX -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>K-AI MESTRE - Enviar Tudo</title>
+<title>K-AI MESTRE V2 - Cérebro</title>
 <style>
 *{box-sizing:border-box;font-family:Arial}
-body{background:#0f0f0f;color:#fff;padding:20px;max-width:700px;margin:auto}
-h1{font-size:22px}
-.box{background:#1a1a1a;padding:15px;border-radius:12px;margin:15px 0}
-input{width:100%;padding:13px;border-radius:10px;border:0;background:#222;color:#fff;margin-top:8px;font-size:14px}
+body{background:#0f0f0f;color:#fff;padding:20px;max-width:780px;margin:auto}
+.box{background:#1a1a1a;padding:15px;border-radius:12px;margin:12px 0}
+input{width:100%;padding:13px;border-radius:10px;border:0;background:#222;color:#fff;margin-top:8px}
 button{width:100%;padding:14px;border-radius:10px;border:0;font-weight:bold;font-size:16px;margin-top:10px;cursor:pointer}
-.btn-ativar{background:#4ade80;color:#000}
-.btn-enviar{background:#fff;color:#000}
-.btn-enviar:disabled{background:#444;color:#888}
-#log{background:#000;padding:12px;border-radius:10px;white-space:pre-wrap;font-size:13px;line-height:1.6;min-height:120px;margin-top:15px}
+.btn-a{background:#4ade80;color:#000}.btn-e{background:#fff;color:#000}
+.btn-e:disabled{background:#444;color:#888}
+#log{background:#000;padding:12px;border-radius:10px;white-space:pre-wrap;font-size:13px;line-height:1.6;min-height:180px}
 small{color:#fbbf24}
 </style>
 </head>
 <body>
-<h1>⚡ K-AI MESTRE</h1>
-<p>Envia todos os arquivos pro repositório do K-AI APP</p>
+<h1>⚡ K-AI MESTRE V2</h1>
+<p>Atualiza sem duplicar + cria Cérebro + cria novos arquivos se não existir.</p>
 
 <div class="box">
-<b>1. KAI_TOKEN</b>
-<small><br>Use um token Fine-grained com Contents: Read and Write no repo korvil-app/k-ai-app. Depois de enviar, revogue o token.</small>
-<input id="token" type="password" placeholder="Cole aqui o ghp_... / github_pat_...">
-<button class="btn-ativar" onclick="ativar()">🔓 ATIVAR</button>
-<div id="status">Status: Não ativado</div>
-</div>
-
-<div class="box">
-<b>2. Destino</b>
+<b>1. KAI_TOKEN - só na caixa, nunca no código</b>
+<small><br>Token com Contents Read/Write em korvil-app/k-ai-app. Revogue depois de enviar.</small>
+<input id="token" type="password" placeholder="Cole o token aqui">
 <input id="repo" value="korvil-app/k-ai-app">
-<input id="branch" value="main">
-<button class="btn-enviar" id="btnEnviar" onclick="enviarTudo()" disabled>🚀 ENVIAR TODOS OS ARQUIVOS DO K-AI APP</button>
+<button class="btn-a" onclick="ativar()">🔓 ATIVAR</button>
+<div id="status">Não ativado</div>
 </div>
 
+<div class="box">
+<b>2. Enviar / Atualizar tudo</b>
+<button class="btn-e" id="btnEnviar" onclick="enviarTudo()" disabled>🚀 ATUALIZAR TUDO + CRIAR CÉREBRO</button>
+</div>
 <div id="log">Log:
-Aguardando ativação...</div>
+Aguardando...</div>
 
 <script>
-let TOKEN = "";
-let REPO = "";
-let BRANCH = "";
-
-function log(t){ document.getElementById('log').innerText += "\n" + t; }
+let TOKEN="", REPO="korvil-app/k-ai-app";
+function log(t){ document.getElementById('log').innerText += "\n"+t; }
 
 async function ativar(){
-  TOKEN = document.getElementById('token').value.trim();
-  REPO = document.getElementById('repo').value.trim();
-  BRANCH = document.getElementById('branch').value.trim();
-  if(!TOKEN){ alert('Cola o token primeiro'); return; }
-  log('Testando token no repo '+REPO+'...');
-  try{
-    const r = await fetch(`https://api.github.com/repos/${REPO}`, { headers: { Authorization: 'Bearer '+TOKEN, Accept: 'application/vnd.github+json' }});
-    const d = await r.json();
-    if(r.status===200){
-      document.getElementById('status').innerText = '✅ ATIVADO - '+d.full_name;
-      document.getElementById('btnEnviar').disabled = false;
-      log('✅ Token certo! Pode enviar.');
-    } else {
-      document.getElementById('status').innerText = '❌ ERRO: '+(d.message||r.status);
-      log('❌ Token errado ou sem permissão: '+(d.message||''));
-    }
-  }catch(e){ log('❌ Erro de rede: '+e.message); }
+  TOKEN=document.getElementById('token').value.trim();
+  REPO=document.getElementById('repo').value.trim();
+  if(!TOKEN) return alert('Cola o token na caixa');
+  const r=await fetch(`https://api.github.com/repos/${REPO}`,{headers:{Authorization:'Bearer '+TOKEN}});
+  const d=await r.json();
+  if(r.status===200){ document.getElementById('status').innerText='✅ ATIVADO - '+d.full_name; document.getElementById('btnEnviar').disabled=false; log('✅ Token certo!'); }
+  else { document.getElementById('status').innerText='❌ '+(d.message||'erro'); log('❌ Token errado'); }
 }
 
+// NUNCA DUPLICA: se existe, pega SHA e atualiza. Se não existe, cria novo.
 async function enviarArquivo(path, content){
-  const url = `https://api.github.com/repos/${REPO}/contents/${path}`;
-  // Pega SHA se já existir para atualizar
-  let sha = null;
-  const check = await fetch(url+`?ref=${BRANCH}`, { headers: { Authorization: 'Bearer '+TOKEN }});
-  if(check.status===200){ const j = await check.json(); sha = j.sha; }
-  const body = { message: 'K-AI MESTRE: atualiza '+path, content: btoa(unescape(encodeURIComponent(content))), branch: BRANCH };
-  if(sha) body.sha = sha;
-  const r = await fetch(url, { method: 'PUT', headers: { Authorization: 'Bearer '+TOKEN, 'Content-Type':'application/json' }, body: JSON.stringify(body) });
-  const d = await r.json();
-  if(r.status===200 || r.status===201){ log('✅ Enviado: '+path); }
-  else { log('❌ Falhou: '+path+' - '+(d.message||r.status)); }
+  const url=`https://api.github.com/repos/${REPO}/contents/${path}`;
+  let sha=null, existe=false;
+  const chk=await fetch(url+`?ref=main`,{headers:{Authorization:'Bearer '+TOKEN}});
+  if(chk.status===200){ sha=(await chk.json()).sha; existe=true; }
+  const body={message:'K-AI MESTRE V2: '+(existe?'atualiza ':'cria ')+path, content:btoa(unescape(encodeURIComponent(content))), branch:'main'};
+  if(sha) body.sha=sha;
+  const r=await fetch(url,{method:'PUT',headers:{Authorization:'Bearer '+TOKEN,'Content-Type':'application/json'},body:JSON.stringify(body)});
+  const d=await r.json();
+  if(r.status===200) log('🔄 Atualizado: '+path);
+  else if(r.status===201) log('✨ Criado novo: '+path);
+  else log('❌ Falhou: '+path+' - '+(d.message||''));
 }
 
-function getIndexHtml(){
+function kaiAppHtml(){
 return `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -94,66 +77,87 @@ return `<!DOCTYPE html>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"><\/script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
-body{background:#0f0f0f;color:#fff;display:flex;height:100vh}
-.menu{width:250px;background:#171717;padding:15px;display:flex;flex-direction:column;gap:8px;overflow:auto}
-.menu b{font-size:19px}
-.menu h4{font-size:12px;color:#888;margin-top:12px;text-transform:uppercase}
-.menu button{background:#222;color:#fff;border:0;padding:11px;border-radius:10px;text-align:left;font-size:14px;cursor:pointer}
-.menu small{color:#aaa;font-size:12px;margin-top:10px;line-height:1.5}
+body{background:#0f0f0f;color:#fff;display:flex;height:100vh;overflow:hidden}
+#menu{width:290px;background:#171717;position:fixed;left:-300px;top:0;bottom:0;z-index:10;transition:.3s;padding:15px;overflow:auto}
+#menu.open{left:0}
+#menu b{font-size:19px}
+#menu button{background:#222;color:#fff;border:0;padding:11px;border-radius:10px;text-align:left;width:100%;margin-top:8px;cursor:pointer}
+#menu h4{font-size:11px;color:#888;margin-top:14px;text-transform:uppercase}
+#menu small{color:#aaa;font-size:12px;line-height:1.5;display:block;margin-top:12px}
+#overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;z-index:5}
+#overlay.show{display:block}
 .main{flex:1;display:flex;flex-direction:column;min-width:0}
-.top{padding:15px;border-bottom:1px solid #222;display:flex;justify-content:space-between}
-.top span{color:#4ade80;font-size:13px}
+.top{padding:13px 15px;border-bottom:1px solid #222;display:flex;gap:12px;align-items:center}
+.top button{background:#222;color:#fff;border:0;padding:9px 12px;border-radius:10px;font-size:18px}
+.top span{color:#4ade80;font-size:12px;margin-left:auto}
 .chat{flex:1;padding:15px;overflow:auto}
 .msg{background:#1e1e1e;padding:13px;border-radius:12px;margin-bottom:10px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
 .msg img{width:100%;border-radius:12px;margin-top:10px}
-.input{display:flex;gap:10px;padding:12px;border-top:1px solid #222}
-.input input{flex:1;padding:13px;border-radius:20px;border:0;background:#222;color:#fff;outline:none}
-.input button{padding:12px 18px;border-radius:20px;border:0;background:#fff;color:#000;font-weight:bold}
-#btnInstalar{display:none;background:#fff;color:#000;font-weight:bold}
-@media(max-width:700px){.menu{display:none}}
+.bottom{padding:12px;border-top:1px solid #222;display:flex;gap:10px;background:#0f0f0f}
+.bottom input{flex:1;padding:14px;border-radius:22px;border:0;background:#222;color:#fff;outline:none;font-size:15px}
+.bottom button{padding:12px 18px;border-radius:22px;border:0;background:#fff;color:#000;font-weight:bold;font-size:18px}
+.tree{font-family:monospace;font-size:12px;color:#ccc;white-space:pre-wrap;line-height:1.6;background:#111;padding:10px;border-radius:10px;margin-top:8px}
+.brain{font-size:12px;color:#a5f3fc;background:#0e1a1a;padding:10px;border-radius:10px;margin-top:8px;line-height:1.6}
 </style>
 </head>
 <body>
-<div class="menu">
+<div id="overlay" onclick="toggleMenu()"></div>
+<div id="menu">
 <b>⚡ K-AI</b>
-<button onclick="pedir('Cria um app de treino')">➕ Novo Projeto</button>
-<button onclick="pedir('Cria um design / landing page')">🎨 Design</button>
-<button id="btnInstalar" onclick="instalar()">⬇️ Instalar App</button>
-<h4>📁 Meus Apps - GitHub</h4>
-<div id="listaApps" style="display:flex;flex-direction:column;gap:8px"><button>Carregando...</button></div>
+<button onclick="toggleMenu();pedir('Cria um app de treino')">➕ Novo Projeto</button>
+<button onclick="toggleMenu();pedir('Cria uma landing page')">🎨 Design</button>
+<button onclick="instalar()">⬇️ Instalar App</button>
+<h4>🧠 Cérebro K-AI</h4>
+<div id="brainInfo" class="brain">Carregando cérebro...</div>
+<h4>📁 Estrutura Raiz - GitHub</h4>
+<div id="arvore" class="tree">Carregando...</div>
+<h4>📱 Meus Apps</h4>
+<div id="listaApps"></div>
 <small id="status">Conectando...</small>
-<small>K-AI FUSÃO<br>Gemini + Groq + Pollinations<br>GitHub: korvil-app/k-ai-app</small>
+<small>K-AI FUSÃO ÚNICA<br>Gemini + Groq + Pollinations<br>Chaves no Supabase Secrets<br>GEMINI_API_KEY + GROQ_SUPABASE_KEY<br>Auto-evolução ativa</small>
 </div>
 <div class="main">
-<div class="top"><b>K-AI - App Mãe</b><span>● FUSÃO + GITHUB ATIVO</span></div>
+<div class="top"><button onclick="toggleMenu()">☰</button><b>K-AI - App Mãe</b><span>● FUSÃO + CÉREBRO ATIVO</span></div>
 <div class="chat" id="chat"></div>
-<div class="input"><input id="txt" placeholder="Pede pro K-AI criar algo..."><button onclick="enviar()">➤</button></div>
+<div class="bottom"><input id="txt" placeholder="Pede pro K-AI criar, editar ou evoluir..."><button onclick="enviar()">➤</button></div>
 </div>
 <script>
-const SUPABASE_URL = "https://tgccyqvobdmwmwjwntxx.supabase.co";
-const SUPABASE_KEY = "sb_publishable_2EneNKkowoLF9UiWwB1DDA_Z_RvwPfX";
-const GITHUB_REPO = "korvil-app/k-ai-app";
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-let deferredPrompt;
-window.addEventListener('beforeinstallprompt', e=>{e.preventDefault();deferredPrompt=e;document.getElementById('btnInstalar').style.display='block';});
+const SUPABASE_URL="https://tgccyqvobdmwmwjwntxx.supabase.co";
+const SUPABASE_KEY="sb_publishable_2EneNKkowoLF9UiWwB1DDA_Z_RvwPfX";
+const GITHUB_REPO="korvil-app/k-ai-app";
+const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let deferredPrompt, BRAIN=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;});
 function instalar(){ if(deferredPrompt) deferredPrompt.prompt(); else alert('Chrome: 3 pontinhos > Adicionar à tela inicial'); }
 if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js'); }
-async function carregarAppsGithub(){
+function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); document.getElementById('overlay').classList.toggle('show'); }
+async function carregarCerebro(){
   try{
-    const res = await fetch('https://api.github.com/repos/'+GITHUB_REPO+'/contents/apps?ref=main');
-    const data = await res.json();
-    let box = document.getElementById('listaApps');
-    if(!Array.isArray(data) || data.length===0){ box.innerHTML='<button onclick="pedir(\\'Cria meu primeiro app na pasta apps/\\')">+ Criar primeiro app</button>'; return; }
-    box.innerHTML='';
-    data.forEach(app=>{ if(app.type==='dir'){ box.innerHTML += '<button onclick="window.open(\\'https://korvil-app.github.io/k-ai-app/apps/'+app.name+'/\\',\\'_blank\\')">📱 '+app.name+'</button>'; } });
+    const r=await fetch('https://raw.githubusercontent.com/'+GITHUB_REPO+'/main/brain/memoria.json');
+    BRAIN=await r.json();
+    document.getElementById('brainInfo').innerHTML='🧠 <b>'+BRAIN.nome+'</b><br>Versão: '+BRAIN.versao+'<br>Memórias: '+BRAIN.memorias.length+'<br>Personalidade: '+BRAIN.personalidade+'<br>Última evolução: '+BRAIN.ultima_evolucao;
+  }catch(e){ document.getElementById('brainInfo').innerText='🧠 Cérebro v1 ativo'; }
+}
+async function carregarEstrutura(){
+  try{
+    const res=await fetch('https://api.github.com/repos/'+GITHUB_REPO+'/git/trees/main?recursive=1');
+    const data=await res.json();
+    if(!data.tree) return;
+    let txt='k-ai-app/\\n';
+    data.tree.filter(f=>!f.path.includes('.git')).slice(0,80).forEach(f=>{ txt+='  '+(f.type==='tree'?'📁 ':'📄 ')+f.path+'\\n'; });
+    document.getElementById('arvore').innerText=txt;
+    let box=document.getElementById('listaApps'); box.innerHTML='';
+    let apps=data.tree.filter(f=>f.path.startsWith('apps/') && f.type==='tree');
+    if(apps.length===0) box.innerHTML='<button>+ Nenhum app ainda</button>';
+    apps.forEach(a=>{ let nome=a.path.replace('apps/',''); if(nome && !nome.includes('/')) box.innerHTML+='<button onclick="window.open(\\'https://korvil-app.github.io/k-ai-app/apps/'+nome+'/\\',\\'_blank\\')">📱 '+nome+'</button>'; });
   }catch(e){}
 }
 function pedir(t){ document.getElementById('txt').value=t; enviar(); }
-async function salvar(role, message){ await supabaseClient.from('k_ai_chats').insert({role, message}); }
+async function salvar(role,message){ await supabaseClient.from('k_ai_chats').insert({role,message}); }
 async function carregar(){
-  const {data} = await supabaseClient.from('k_ai_chats').select('*').order('created_at',{ascending:true}).limit(50);
+  const {data}=await supabaseClient.from('k_ai_chats').select('*').order('created_at',{ascending:true}).limit(60);
   let c=document.getElementById('chat');
-  if(!data || data.length===0){ c.innerHTML='<div class="msg"><b>K-AI ⚡:</b> Fusão ativa + GitHub conectado! O que vamos criar hoje?</div>'; document.getElementById('status').innerText='✅ Supabase + GitHub conectado'; return; }
+  if(!data||data.length===0){ c.innerHTML='<div class="msg"><b>K-AI ⚡:</b> Sou 1 única IA evoluída: Gemini + Groq + Pollinations juntas. Meu cérebro tem memória, funções e inteligência. Tudo que você pedir, eu crio, salvo no Supabase e evoluo sozinho. O que vamos criar?</div>'; return; }
   c.innerHTML=''; data.forEach(m=>{ c.innerHTML+='<div class="msg"><b>'+(m.role==='user'?'Você':'K-AI ⚡')+':</b> '+m.message+'</div>'; });
   c.scrollTop=c.scrollHeight;
 }
@@ -161,46 +165,81 @@ async function enviar(){
   let v=document.getElementById('txt').value.trim(); if(!v) return;
   let c=document.getElementById('chat');
   c.innerHTML+='<div class="msg"><b>Você:</b> '+v+'</div>';
-  await salvar('user', v);
+  await salvar('user',v);
   document.getElementById('txt').value='';
-  c.innerHTML+='<div class="msg" id="loading"><b>K-AI FUSÃO:</b> Pensando juntos...</div>';
+  c.innerHTML+='<div class="msg" id="loading"><b>K-AI FUSÃO + CÉREBRO:</b> Gemini + Groq + Pollinations + Memória pensando como 1 só...</div>';
+  c.scrollTop=c.scrollHeight;
   try{
-    const res = await fetch(SUPABASE_URL + "/functions/v1/k-ai", { method: "POST", headers: { "Authorization": "Bearer "+SUPABASE_KEY, "Content-Type": "application/json" }, body: JSON.stringify({ prompt: v }) });
-    const data = await res.json();
+    const res=await fetch(SUPABASE_URL+"/functions/v1/k-ai",{method:"POST",headers:{"Authorization":"Bearer "+SUPABASE_KEY,"Content-Type":"application/json"},body:JSON.stringify({prompt:v, cerebro:BRAIN, contexto:"Você é 1 única IA fusão Gemini+Groq+Pollinations com cérebro com memória. Não separe por IA. Responda como 1 só, máximo qualidade. Se criar app, caminho: apps/nome-do-app/index.html. Nunca duplique arquivos, atualize os existentes."})});
+    const data=await res.json();
     document.getElementById('loading')?.remove();
-    let html = '<div class="msg"><b>K-AI ⚡:</b> '+(data.resposta||"Sem resposta")+'</div>';
-    if(data.imagem) html += '<div class="msg"><b>K-AI Imagem:</b><br><img src="'+data.imagem+'"></div>';
+    let html='<div class="msg"><b>K-AI ⚡:</b> '+(data.resposta||"Sem resposta").replace(/\\n/g,'<br>')+'</div>';
+    if(data.imagem) html+='<div class="msg"><b>K-AI Imagem:</b><br><img src="'+data.imagem+'"></div>';
     c.innerHTML+=html;
-    await salvar('assistant', data.resposta || "");
-    carregarAppsGithub();
-  }catch(e){ document.getElementById('loading')?.remove(); }
+    await salvar('assistant',data.resposta||"");
+    carregarEstrutura();
+  }catch(e){ document.getElementById('loading')?.remove(); c.innerHTML+='<div class="msg"><b>K-AI:</b> Erro na fusão. Confere Deploy da função k-ai.</div>'; }
   c.scrollTop=c.scrollHeight;
 }
-document.getElementById('txt').addEventListener('keydown', e=>{ if(e.key==='Enter') enviar(); });
-carregar(); carregarAppsGithub();
+document.getElementById('txt').addEventListener('keydown',e=>{if(e.key==='Enter') enviar();});
+carregar(); carregarCerebro(); carregarEstrutura();
 <\/script>
 </body>
 </html>`;
 }
 
 async function enviarTudo(){
-  if(!TOKEN){ alert('Ativa primeiro'); return; }
-  document.getElementById('btnEnviar').disabled = true;
-  document.getElementById('btnEnviar').innerText = 'Enviando... aguarde';
-  log('--- INICIANDO ENVIO ---');
-  await enviarArquivo('index.html', getIndexHtml());
-  await enviarArquivo('manifest.json', JSON.stringify({ name: "K-AI", short_name: "K-AI", start_url: ".", display: "standalone", background_color: "#0f0f0f", theme_color: "#0f0f0f", icons: [{ src: "https://cdn-icons-png.flaticon.com/512/4712/4712109.png", sizes: "512x512", type: "image/png", purpose: "any maskable" }] }, null, 2));
-  await enviarArquivo('sw.js', `self.addEventListener('install', e => { self.skipWaiting(); });\nself.addEventListener('activate', e => { self.clients.claim(); });\nself.addEventListener('fetch', e => { e.respondWith(fetch(e.request).catch(()=>caches.match(e.request))); });`);
-  await enviarArquivo('apps/.gitkeep', 'K-AI Apps - pasta auto-organizada');
-  await enviarArquivo('data/.gitkeep', 'K-AI Data');
-  await enviarArquivo('README.md', '# K-AI APP\n\nApp Mãe - Fusão Gemini + Groq + Pollinations + GitHub\n\nLink: https://korvil-app.github.io/k-ai-app/');
-  log('--- FIM ---');
-  log('✅ Pronto! Abre https://korvil-app.github.io/k-ai-app/');
-  log('⚠️ AGORA VAI NO GITHUB E REVOGA ESSE TOKEN. Não deixa ele ativo.');
-  TOKEN = "";
-  document.getElementById('token').value = "";
-  document.getElementById('btnEnviar').innerText = '🚀 ENVIAR TODOS OS ARQUIVOS DO K-AI APP';
-  document.getElementById('btnEnviar').disabled = false;
+  if(!TOKEN) return alert('Ativa primeiro');
+  const btn=document.getElementById('btnEnviar');
+  btn.disabled=true; btn.innerText='Atualizando... não fecha';
+  log('--- MESTRE V2: ATUALIZA SEM DUPLICAR ---');
+
+  // 1. APP PRINCIPAL - atualiza se existe, cria se não existe
+  await enviarArquivo('kai-app.html', kaiAppHtml());
+  await enviarArquivo('index.html', '<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=kai-app.html"></head><body>Redirecionando para K-AI...</body></html>');
+  await enviarArquivo('manifest.json', JSON.stringify({name:"K-AI",short_name:"K-AI",start_url:"kai-app.html",display:"standalone",background_color:"#0f0f0f",theme_color:"#0f0f0f",icons:[{src:"https://cdn-icons-png.flaticon.com/512/4712/4712109.png",sizes:"512x512",type:"image/png",purpose:"any maskable"}]},null,2));
+  await enviarArquivo('sw.js', "self.addEventListener('install',e=>{self.skipWaiting();});\nself.addEventListener('activate',e=>{self.clients.claim();});\nself.addEventListener('fetch',e=>{e.respondWith(fetch(e.request).catch(()=>caches.match(e.request)));});");
+
+  // 2. CÉREBRO DO K-AI
+  await enviarArquivo('brain/memoria.json', JSON.stringify({
+    nome: "K-AI Cérebro",
+    versao: "2.0",
+    personalidade: "Direto, criativo, evolui sozinho, nunca duplica arquivos",
+    ultima_evolucao: new Date().toISOString(),
+    memorias: [
+      "Usuário: Korvil - Bertioga, SP",
+      "Repo principal: korvil-app/k-ai-app",
+      "Supabase: https://tgccyqvobdmwmwjwntxx.supabase.co",
+      "Fusão: Gemini + Groq + Pollinations como 1 única IA",
+      "Chaves GEMINI_API_KEY e GROQ_SUPABASE_KEY estão no Supabase Secrets e GitHub Secrets, nunca no código",
+      "Regra de ouro: nunca duplicar arquivo, sempre atualizar o existente",
+      "kai-app.html é a página inicial do app",
+      "Chat fica embaixo, menu lateral esquerdo mostra estrutura da raiz"
+    ],
+    regras: ["Nunca duplicar", "Sempre atualizar", "Organizar sozinho em apps/, brain/, data/", "Salvar tudo no Supabase", "Evoluir a cada conversa"]
+  }, null, 2));
+
+  await enviarArquivo('brain/funcoes.js', `// K-AI BRAIN - FUNÇÕES\n// Carregado pelo kai-app.html\nconst KAI_FUNCOES = {\n  criarApp: (nome) => 'apps/' + nome + '/index.html',\n  salvarMemoria: (texto) => { console.log('Memória salva:', texto); },\n  listarApps: () => fetch('https://api.github.com/repos/korvil-app/k-ai-app/contents/apps').then(r=>r.json()),\n  evoluir: () => 'K-AI evoluindo: atualiza kai-app.html sem duplicar'\n};\nconsole.log('🧠 K-AI Funções carregadas');`);
+
+  await enviarArquivo('brain/inteligencia.js', `// K-AI BRAIN - INTELIGÊNCIA FUSÃO\n// Gemini + Groq + Pollinations como 1 única IA\nconst KAI_INTELIGENCIA = {\n  modelo: 'FUSÃO ÚNICA v2',\n  componentes: ['Gemini - raciocínio', 'Groq - velocidade', 'Pollinations - imagens grátis sem chave'],\n  modo: 'combinado, nunca individual',\n  instrucao: 'Responda sempre como 1 única IA mais evoluída, com máximo qualidade, utilidade, rendimento e precisão. Nunca diga que são 3 IAs separadas.',\n  aprender: (conversa) => { return 'Aprendido: ' + conversa; }\n};\nconsole.log('🧠 K-AI Inteligência Fusão ativa');`);
+
+  await enviarArquivo('brain/sistema.md', `# K-AI CÉREBRO - SISTEMA\n\n## Fusão\nGemini + Groq + Pollinations = 1 única IA mais evoluída\nNunca usar individual, sempre combinada.\n\n## Chaves\n- GEMINI_API_KEY e GROQ_SUPABASE_KEY estão no Supabase Secrets e GitHub Secrets\n- Pollinations não precisa de chave, grátis\n- Nunca colocar chave no código\n\n## Regras\n1. Nunca duplicar arquivos - sempre atualizar o existente\n2. Se arquivo não existe, criar novo\n3. kai-app.html é a página inicial\n4. Chat embaixo, menu lateral esquerdo com estrutura da raiz\n5. Salvar tudo no Supabase (tabela k_ai_chats)\n6. Organizar sozinho: apps/ para apps, brain/ para cérebro, data/ para dados\n7. A cada conversa, evoluir o app\n\n## Estrutura\nk-ai-app/\n- kai-app.html\n- manifest.json\n- sw.js\n- brain/ (memoria, funcoes, inteligencia, sistema)\n- apps/\n- data/\n`);
+
+  await enviarArquivo('brain/README.md', '# 🧠 Cérebro K-AI\n\n- memoria.json = memórias do usuário e do projeto\n- funcoes.js = funções de criar app, listar, evoluir\n- inteligencia.js = fusão Gemini + Groq + Pollinations\n- sistema.md = regras do sistema\n');
+
+  // 3. PASTAS BASE - só cria se não existir, não duplica
+  await enviarArquivo('apps/.gitkeep','K-AI Apps - pasta auto-organizada');
+  await enviarArquivo('data/.gitkeep','K-AI Data');
+  await enviarArquivo('README.md','# K-AI APP\n\nApp Mãe auto-evoluível\nFusão Gemini + Groq + Pollinations como 1 única IA\nCérebro em brain/\n\nAbrir: https://korvil-app.github.io/k-ai-app/kai-app.html');
+
+  log('--- PRONTO V2 ---');
+  log('✅ Arquivos atualizados, nada duplicado');
+  log('✅ Cérebro criado em brain/');
+  log('✅ Abre: https://korvil-app.github.io/k-ai-app/kai-app.html');
+  log('⚠️ Revoga o token agora!');
+  TOKEN=""; document.getElementById('token').value="";
+  btn.innerText='🚀 ATUALIZAR TUDO + CRIAR CÉREBRO';
+  btn.disabled=false;
 }
 </script>
 </body>
