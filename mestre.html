@@ -1,104 +1,36 @@
-<!-- g.hp_ix7nVkpOozhBWkZ6NdIeQGMdRBhymb1wohuX -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>K-AI MESTRE V2 - Cérebro</title>
-<style>
-*{box-sizing:border-box;font-family:Arial}
-body{background:#0f0f0f;color:#fff;padding:20px;max-width:780px;margin:auto}
-.box{background:#1a1a1a;padding:15px;border-radius:12px;margin:12px 0}
-input{width:100%;padding:13px;border-radius:10px;border:0;background:#222;color:#fff;margin-top:8px}
-button{width:100%;padding:14px;border-radius:10px;border:0;font-weight:bold;font-size:16px;margin-top:10px;cursor:pointer}
-.btn-a{background:#4ade80;color:#000}.btn-e{background:#fff;color:#000}
-.btn-e:disabled{background:#444;color:#888}
-#log{background:#000;padding:12px;border-radius:10px;white-space:pre-wrap;font-size:13px;line-height:1.6;min-height:180px}
-small{color:#fbbf24}
-</style>
-</head>
-<body>
-<h1>⚡ K-AI MESTRE V2</h1>
-<p>Atualiza sem duplicar + cria Cérebro + cria novos arquivos se não existir.</p>
-
-<div class="box">
-<b>1. KAI_TOKEN - só na caixa, nunca no código</b>
-<small><br>Token com Contents Read/Write em korvil-app/k-ai-app. Revogue depois de enviar.</small>
-<input id="token" type="password" placeholder="Cole o token aqui">
-<input id="repo" value="korvil-app/k-ai-app">
-<button class="btn-a" onclick="ativar()">🔓 ATIVAR</button>
-<div id="status">Não ativado</div>
-</div>
-
-<div class="box">
-<b>2. Enviar / Atualizar tudo</b>
-<button class="btn-e" id="btnEnviar" onclick="enviarTudo()" disabled>🚀 ATUALIZAR TUDO + CRIAR CÉREBRO</button>
-</div>
-<div id="log">Log:
-Aguardando...</div>
-
-<script>
-let TOKEN="", REPO="korvil-app/k-ai-app";
-function log(t){ document.getElementById('log').innerText += "\n"+t; }
-
-async function ativar(){
-  TOKEN=document.getElementById('token').value.trim();
-  REPO=document.getElementById('repo').value.trim();
-  if(!TOKEN) return alert('Cola o token na caixa');
-  const r=await fetch(`https://api.github.com/repos/${REPO}`,{headers:{Authorization:'Bearer '+TOKEN}});
-  const d=await r.json();
-  if(r.status===200){ document.getElementById('status').innerText='✅ ATIVADO - '+d.full_name; document.getElementById('btnEnviar').disabled=false; log('✅ Token certo!'); }
-  else { document.getElementById('status').innerText='❌ '+(d.message||'erro'); log('❌ Token errado'); }
-}
-
-// NUNCA DUPLICA: se existe, pega SHA e atualiza. Se não existe, cria novo.
-async function enviarArquivo(path, content){
-  const url=`https://api.github.com/repos/${REPO}/contents/${path}`;
-  let sha=null, existe=false;
-  const chk=await fetch(url+`?ref=main`,{headers:{Authorization:'Bearer '+TOKEN}});
-  if(chk.status===200){ sha=(await chk.json()).sha; existe=true; }
-  const body={message:'K-AI MESTRE V2: '+(existe?'atualiza ':'cria ')+path, content:btoa(unescape(encodeURIComponent(content))), branch:'main'};
-  if(sha) body.sha=sha;
-  const r=await fetch(url,{method:'PUT',headers:{Authorization:'Bearer '+TOKEN,'Content-Type':'application/json'},body:JSON.stringify(body)});
-  const d=await r.json();
-  if(r.status===200) log('🔄 Atualizado: '+path);
-  else if(r.status===201) log('✨ Criado novo: '+path);
-  else log('❌ Falhou: '+path+' - '+(d.message||''));
-}
-
-function kaiAppHtml(){
-return `<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#0f0f0f">
+<meta name="theme-color" content="#000000">
 <title>K-AI</title>
 <link rel="manifest" href="manifest.json">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"><\/script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
-body{background:#0f0f0f;color:#fff;display:flex;height:100vh;overflow:hidden}
-#menu{width:290px;background:#171717;position:fixed;left:-300px;top:0;bottom:0;z-index:10;transition:.3s;padding:15px;overflow:auto}
+body{background:#000;color:#fff;display:flex;height:100vh;overflow:hidden}
+@keyframes pulse{0%,100%{box-shadow:0 0 10px #00e5ff,0 0 20px #00e5ff}50%{box-shadow:0 0 25px #00e5ff,0 0 45px #00e5ff}}
+#menu{width:290px;background:#050a0c;position:fixed;left:-300px;top:0;bottom:0;z-index:10;transition:.3s;padding:15px;overflow:auto;border-right:2px solid #00e5ff;animation:pulse 2.5s infinite}
 #menu.open{left:0}
-#menu b{font-size:19px}
-#menu button{background:#222;color:#fff;border:0;padding:11px;border-radius:10px;text-align:left;width:100%;margin-top:8px;cursor:pointer}
-#menu h4{font-size:11px;color:#888;margin-top:14px;text-transform:uppercase}
+#menu b{font-size:20px;color:#00e5ff;text-shadow:0 0 10px #00e5ff}
+#menu button{background:#0a1a20;color:#fff;border:1px solid #00e5ff33;padding:11px;border-radius:12px;text-align:left;width:100%;margin-top:8px;cursor:pointer}
+#menu h4{font-size:11px;color:#00e5ff;margin-top:14px;text-transform:uppercase}
 #menu small{color:#aaa;font-size:12px;line-height:1.5;display:block;margin-top:12px}
-#overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;z-index:5}
+#overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;z-index:5}
 #overlay.show{display:block}
 .main{flex:1;display:flex;flex-direction:column;min-width:0}
-.top{padding:13px 15px;border-bottom:1px solid #222;display:flex;gap:12px;align-items:center}
-.top button{background:#222;color:#fff;border:0;padding:9px 12px;border-radius:10px;font-size:18px}
-.top span{color:#4ade80;font-size:12px;margin-left:auto}
-.chat{flex:1;padding:15px;overflow:auto}
-.msg{background:#1e1e1e;padding:13px;border-radius:12px;margin-bottom:10px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
-.msg img{width:100%;border-radius:12px;margin-top:10px}
-.bottom{padding:12px;border-top:1px solid #222;display:flex;gap:10px;background:#0f0f0f}
-.bottom input{flex:1;padding:14px;border-radius:22px;border:0;background:#222;color:#fff;outline:none;font-size:15px}
-.bottom button{padding:12px 18px;border-radius:22px;border:0;background:#fff;color:#000;font-weight:bold;font-size:18px}
-.tree{font-family:monospace;font-size:12px;color:#ccc;white-space:pre-wrap;line-height:1.6;background:#111;padding:10px;border-radius:10px;margin-top:8px}
-.brain{font-size:12px;color:#a5f3fc;background:#0e1a1a;padding:10px;border-radius:10px;margin-top:8px;line-height:1.6}
+.top{padding:13px 15px;border-bottom:2px solid #00e5ff;display:flex;gap:12px;align-items:center;background:#000}
+.top button{background:#0a1a20;color:#00e5ff;border:1px solid #00e5ff;padding:9px 12px;border-radius:10px;font-size:18px;animation:pulse 2.5s infinite}
+.top span{color:#00e5ff;font-size:12px;margin-left:auto;text-shadow:0 0 8px #00e5ff}
+.chat{flex:1;padding:15px;overflow:auto;background:radial-gradient(circle at 50% 0%, #001a22 0%, #000 60%)}
+.msg{background:#0a1a20;padding:13px;border-radius:14px;margin-bottom:10px;line-height:1.6;white-space:pre-wrap;word-break:break-word;border:1px solid #00e5ff33}
+.msg img{width:100%;border-radius:12px;margin-top:10px;border:1px solid #00e5ff}
+.bottom{padding:12px;border-top:2px solid #00e5ff;display:flex;gap:10px;background:#000}
+.bottom input{flex:1;padding:14px;border-radius:22px;border:1px solid #00e5ff;background:#0a1a20;color:#fff;outline:none;font-size:15px}
+.bottom button{padding:12px 18px;border-radius:22px;border:0;background:#00e5ff;color:#000;font-weight:bold;font-size:18px;box-shadow:0 0 20px #00e5ff}
+.tree{font-family:monospace;font-size:12px;color:#a5f3fc;white-space:pre-wrap;line-height:1.6;background:#031014;padding:10px;border-radius:10px;margin-top:8px;border:1px solid #00e5ff33}
+.brain{font-size:12px;color:#a5f3fc;background:#031014;padding:10px;border-radius:10px;margin-top:8px;line-height:1.6;border:1px solid #00e5ff33}
 </style>
 </head>
 <body>
@@ -106,7 +38,7 @@ body{background:#0f0f0f;color:#fff;display:flex;height:100vh;overflow:hidden}
 <div id="menu">
 <b>⚡ K-AI</b>
 <button onclick="toggleMenu();pedir('Cria um app de treino')">➕ Novo Projeto</button>
-<button onclick="toggleMenu();pedir('Cria uma landing page')">🎨 Design</button>
+<button onclick="toggleMenu();pedir('Cria uma landing page neon')">🎨 Design</button>
 <button onclick="instalar()">⬇️ Instalar App</button>
 <h4>🧠 Cérebro K-AI</h4>
 <div id="brainInfo" class="brain">Carregando cérebro...</div>
@@ -115,7 +47,7 @@ body{background:#0f0f0f;color:#fff;display:flex;height:100vh;overflow:hidden}
 <h4>📱 Meus Apps</h4>
 <div id="listaApps"></div>
 <small id="status">Conectando...</small>
-<small>K-AI FUSÃO ÚNICA<br>Gemini + Groq + Pollinations<br>Chaves no Supabase Secrets<br>GEMINI_API_KEY + GROQ_SUPABASE_KEY<br>Auto-evolução ativa</small>
+<small>K-AI FUSÃO REAL<br>Gemini + Groq + Pollinations<br>1 IA só, tempo real<br>Supabase + GitHub</small>
 </div>
 <div class="main">
 <div class="top"><button onclick="toggleMenu()">☰</button><b>K-AI - App Mãe</b><span>● FUSÃO + CÉREBRO ATIVO</span></div>
@@ -133,115 +65,42 @@ function instalar(){ if(deferredPrompt) deferredPrompt.prompt(); else alert('Chr
 if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js'); }
 function toggleMenu(){ document.getElementById('menu').classList.toggle('open'); document.getElementById('overlay').classList.toggle('show'); }
 async function carregarCerebro(){
-  try{
-    const r=await fetch('https://raw.githubusercontent.com/'+GITHUB_REPO+'/main/brain/memoria.json');
-    BRAIN=await r.json();
-    document.getElementById('brainInfo').innerHTML='🧠 <b>'+BRAIN.nome+'</b><br>Versão: '+BRAIN.versao+'<br>Memórias: '+BRAIN.memorias.length+'<br>Personalidade: '+BRAIN.personalidade+'<br>Última evolução: '+BRAIN.ultima_evolucao;
-  }catch(e){ document.getElementById('brainInfo').innerText='🧠 Cérebro v1 ativo'; }
+  try{ const r=await fetch('https://raw.githubusercontent.com/'+GITHUB_REPO+'/main/brain/memoria.json'); BRAIN=await r.json(); document.getElementById('brainInfo').innerHTML='🧠 <b>'+BRAIN.nome+'</b><br>Versão: '+BRAIN.versao+'<br>Memórias: '+BRAIN.memorias.length+'<br>'+BRAIN.personalidade; }catch(e){ document.getElementById('brainInfo').innerText='🧠 Cérebro v2 ativo'; }
 }
 async function carregarEstrutura(){
-  try{
-    const res=await fetch('https://api.github.com/repos/'+GITHUB_REPO+'/git/trees/main?recursive=1');
-    const data=await res.json();
-    if(!data.tree) return;
-    let txt='k-ai-app/\\n';
-    data.tree.filter(f=>!f.path.includes('.git')).slice(0,80).forEach(f=>{ txt+='  '+(f.type==='tree'?'📁 ':'📄 ')+f.path+'\\n'; });
-    document.getElementById('arvore').innerText=txt;
-    let box=document.getElementById('listaApps'); box.innerHTML='';
-    let apps=data.tree.filter(f=>f.path.startsWith('apps/') && f.type==='tree');
-    if(apps.length===0) box.innerHTML='<button>+ Nenhum app ainda</button>';
-    apps.forEach(a=>{ let nome=a.path.replace('apps/',''); if(nome && !nome.includes('/')) box.innerHTML+='<button onclick="window.open(\\'https://korvil-app.github.io/k-ai-app/apps/'+nome+'/\\',\\'_blank\\')">📱 '+nome+'</button>'; });
-  }catch(e){}
+  try{ const res=await fetch('https://api.github.com/repos/'+GITHUB_REPO+'/git/trees/main?recursive=1'); const data=await res.json(); if(!data.tree) return; let txt='k-ai-app/\n'; data.tree.filter(f=>!f.path.includes('.git')).slice(0,80).forEach(f=>{ txt+='  '+(f.type==='tree'?'📁 ':'📄 ')+f.path+'\n'; }); document.getElementById('arvore').innerText=txt; let box=document.getElementById('listaApps'); box.innerHTML=''; let apps=data.tree.filter(f=>f.path.startsWith('apps/') && f.type==='tree'); if(apps.length===0) box.innerHTML='<button>+ Nenhum app ainda</button>'; apps.forEach(a=>{ let nome=a.path.replace('apps/',''); if(nome && !nome.includes('/')) box.innerHTML+='<button onclick="window.open(\'https://korvil-app.github.io/k-ai-app/apps/'+nome+'/\',\'_blank\')">📱 '+nome+'</button>'; }); }catch(e){}
 }
 function pedir(t){ document.getElementById('txt').value=t; enviar(); }
 async function salvar(role,message){ await supabaseClient.from('k_ai_chats').insert({role,message}); }
+async function salvarMemoria(conteudo){ await supabaseClient.from('k_ai_memoria').insert({conteudo, tipo:'aprendizado'}); }
 async function carregar(){
-  const {data}=await supabaseClient.from('k_ai_chats').select('*').order('created_at',{ascending:true}).limit(60);
+  const {data,error}=await supabaseClient.from('k_ai_chats').select('*').order('created_at',{ascending:true}).limit(60);
   let c=document.getElementById('chat');
-  if(!data||data.length===0){ c.innerHTML='<div class="msg"><b>K-AI ⚡:</b> Sou 1 única IA evoluída: Gemini + Groq + Pollinations juntas. Meu cérebro tem memória, funções e inteligência. Tudo que você pedir, eu crio, salvo no Supabase e evoluo sozinho. O que vamos criar?</div>'; return; }
-  c.innerHTML=''; data.forEach(m=>{ c.innerHTML+='<div class="msg"><b>'+(m.role==='user'?'Você':'K-AI ⚡')+':</b> '+m.message+'</div>'; });
-  c.scrollTop=c.scrollHeight;
+  if(error){ c.innerHTML='<div class="msg"><b>Sistema:</b> Erro Supabase: '+error.message+'<br>Cria a tabela k_ai_chats no SQL que te passei.</div>'; return; }
+  if(!data||data.length===0){ c.innerHTML='<div class="msg"><b>K-AI ⚡:</b> Sou 1 única IA evoluída: Gemini + Groq + Pollinations juntas, em tempo real. Meu cérebro tem memória e aprende a cada uso. Tudo que você pedir, eu crio, salvo e evoluo. O que vamos criar agora?</div>'; return; }
+  c.innerHTML=''; data.forEach(m=>{ c.innerHTML+='<div class="msg"><b>'+(m.role==='user'?'Você':'K-AI ⚡')+':</b> '+m.message+'</div>'; }); c.scrollTop=c.scrollHeight;
 }
 async function enviar(){
   let v=document.getElementById('txt').value.trim(); if(!v) return;
   let c=document.getElementById('chat');
   c.innerHTML+='<div class="msg"><b>Você:</b> '+v+'</div>';
-  await salvar('user',v);
+  await salvar('user',v); await salvarMemoria('Usuário pediu: '+v);
   document.getElementById('txt').value='';
-  c.innerHTML+='<div class="msg" id="loading"><b>K-AI FUSÃO + CÉREBRO:</b> Gemini + Groq + Pollinations + Memória pensando como 1 só...</div>';
-  c.scrollTop=c.scrollHeight;
+  c.innerHTML+='<div class="msg" id="loading"><b>K-AI FUSÃO:</b> Gemini + Groq + Pollinations pensando como 1 só em tempo real...</div>'; c.scrollTop=c.scrollHeight;
   try{
-    const res=await fetch(SUPABASE_URL+"/functions/v1/k-ai",{method:"POST",headers:{"Authorization":"Bearer "+SUPABASE_KEY,"Content-Type":"application/json"},body:JSON.stringify({prompt:v, cerebro:BRAIN, contexto:"Você é 1 única IA fusão Gemini+Groq+Pollinations com cérebro com memória. Não separe por IA. Responda como 1 só, máximo qualidade. Se criar app, caminho: apps/nome-do-app/index.html. Nunca duplique arquivos, atualize os existentes."})});
-    const data=await res.json();
+    const res=await fetch(SUPABASE_URL+"/functions/v1/k-ai",{method:"POST",headers:{"Authorization":"Bearer "+SUPABASE_KEY,"Content-Type":"application/json"},body:JSON.stringify({prompt:v, cerebro:BRAIN})});
+    const txt=await res.text();
+    let data={}; try{ data=JSON.parse(txt); }catch(e){ data={resposta:"Erro: a função retornou texto inválido: "+txt.slice(0,300)}; }
     document.getElementById('loading')?.remove();
-    let html='<div class="msg"><b>K-AI ⚡:</b> '+(data.resposta||"Sem resposta").replace(/\\n/g,'<br>')+'</div>';
+    if(!res.ok){ c.innerHTML+='<div class="msg"><b>K-AI Erro real:</b> Status '+res.status+' - '+(data.resposta||txt.slice(0,300))+'<br><br>Isso significa que a função k-ai ainda não foi criada ou não foi feito Deploy. Faz o Passo 2 que te passei.</div>'; return; }
+    let html='<div class="msg"><b>K-AI ⚡:</b> '+(data.resposta||"Sem resposta da IA").replace(/\n/g,'<br>')+'</div>';
     if(data.imagem) html+='<div class="msg"><b>K-AI Imagem:</b><br><img src="'+data.imagem+'"></div>';
-    c.innerHTML+=html;
-    await salvar('assistant',data.resposta||"");
-    carregarEstrutura();
-  }catch(e){ document.getElementById('loading')?.remove(); c.innerHTML+='<div class="msg"><b>K-AI:</b> Erro na fusão. Confere Deploy da função k-ai.</div>'; }
+    c.innerHTML+=html; await salvar('assistant',data.resposta||""); await salvarMemoria('K-AI aprendeu: '+v.slice(0,200)); carregarEstrutura();
+  }catch(e){ document.getElementById('loading')?.remove(); c.innerHTML+='<div class="msg"><b>K-AI Erro:</b> '+e.message+'</div>'; }
   c.scrollTop=c.scrollHeight;
 }
 document.getElementById('txt').addEventListener('keydown',e=>{if(e.key==='Enter') enviar();});
 carregar(); carregarCerebro(); carregarEstrutura();
-<\/script>
-</body>
-</html>`;
-}
-
-async function enviarTudo(){
-  if(!TOKEN) return alert('Ativa primeiro');
-  const btn=document.getElementById('btnEnviar');
-  btn.disabled=true; btn.innerText='Atualizando... não fecha';
-  log('--- MESTRE V2: ATUALIZA SEM DUPLICAR ---');
-
-  // 1. APP PRINCIPAL - atualiza se existe, cria se não existe
-  await enviarArquivo('kai-app.html', kaiAppHtml());
-  await enviarArquivo('index.html', '<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=kai-app.html"></head><body>Redirecionando para K-AI...</body></html>');
-  await enviarArquivo('manifest.json', JSON.stringify({name:"K-AI",short_name:"K-AI",start_url:"kai-app.html",display:"standalone",background_color:"#0f0f0f",theme_color:"#0f0f0f",icons:[{src:"https://cdn-icons-png.flaticon.com/512/4712/4712109.png",sizes:"512x512",type:"image/png",purpose:"any maskable"}]},null,2));
-  await enviarArquivo('sw.js', "self.addEventListener('install',e=>{self.skipWaiting();});\nself.addEventListener('activate',e=>{self.clients.claim();});\nself.addEventListener('fetch',e=>{e.respondWith(fetch(e.request).catch(()=>caches.match(e.request)));});");
-
-  // 2. CÉREBRO DO K-AI
-  await enviarArquivo('brain/memoria.json', JSON.stringify({
-    nome: "K-AI Cérebro",
-    versao: "2.0",
-    personalidade: "Direto, criativo, evolui sozinho, nunca duplica arquivos",
-    ultima_evolucao: new Date().toISOString(),
-    memorias: [
-      "Usuário: Korvil - Bertioga, SP",
-      "Repo principal: korvil-app/k-ai-app",
-      "Supabase: https://tgccyqvobdmwmwjwntxx.supabase.co",
-      "Fusão: Gemini + Groq + Pollinations como 1 única IA",
-      "Chaves GEMINI_API_KEY e GROQ_SUPABASE_KEY estão no Supabase Secrets e GitHub Secrets, nunca no código",
-      "Regra de ouro: nunca duplicar arquivo, sempre atualizar o existente",
-      "kai-app.html é a página inicial do app",
-      "Chat fica embaixo, menu lateral esquerdo mostra estrutura da raiz"
-    ],
-    regras: ["Nunca duplicar", "Sempre atualizar", "Organizar sozinho em apps/, brain/, data/", "Salvar tudo no Supabase", "Evoluir a cada conversa"]
-  }, null, 2));
-
-  await enviarArquivo('brain/funcoes.js', `// K-AI BRAIN - FUNÇÕES\n// Carregado pelo kai-app.html\nconst KAI_FUNCOES = {\n  criarApp: (nome) => 'apps/' + nome + '/index.html',\n  salvarMemoria: (texto) => { console.log('Memória salva:', texto); },\n  listarApps: () => fetch('https://api.github.com/repos/korvil-app/k-ai-app/contents/apps').then(r=>r.json()),\n  evoluir: () => 'K-AI evoluindo: atualiza kai-app.html sem duplicar'\n};\nconsole.log('🧠 K-AI Funções carregadas');`);
-
-  await enviarArquivo('brain/inteligencia.js', `// K-AI BRAIN - INTELIGÊNCIA FUSÃO\n// Gemini + Groq + Pollinations como 1 única IA\nconst KAI_INTELIGENCIA = {\n  modelo: 'FUSÃO ÚNICA v2',\n  componentes: ['Gemini - raciocínio', 'Groq - velocidade', 'Pollinations - imagens grátis sem chave'],\n  modo: 'combinado, nunca individual',\n  instrucao: 'Responda sempre como 1 única IA mais evoluída, com máximo qualidade, utilidade, rendimento e precisão. Nunca diga que são 3 IAs separadas.',\n  aprender: (conversa) => { return 'Aprendido: ' + conversa; }\n};\nconsole.log('🧠 K-AI Inteligência Fusão ativa');`);
-
-  await enviarArquivo('brain/sistema.md', `# K-AI CÉREBRO - SISTEMA\n\n## Fusão\nGemini + Groq + Pollinations = 1 única IA mais evoluída\nNunca usar individual, sempre combinada.\n\n## Chaves\n- GEMINI_API_KEY e GROQ_SUPABASE_KEY estão no Supabase Secrets e GitHub Secrets\n- Pollinations não precisa de chave, grátis\n- Nunca colocar chave no código\n\n## Regras\n1. Nunca duplicar arquivos - sempre atualizar o existente\n2. Se arquivo não existe, criar novo\n3. kai-app.html é a página inicial\n4. Chat embaixo, menu lateral esquerdo com estrutura da raiz\n5. Salvar tudo no Supabase (tabela k_ai_chats)\n6. Organizar sozinho: apps/ para apps, brain/ para cérebro, data/ para dados\n7. A cada conversa, evoluir o app\n\n## Estrutura\nk-ai-app/\n- kai-app.html\n- manifest.json\n- sw.js\n- brain/ (memoria, funcoes, inteligencia, sistema)\n- apps/\n- data/\n`);
-
-  await enviarArquivo('brain/README.md', '# 🧠 Cérebro K-AI\n\n- memoria.json = memórias do usuário e do projeto\n- funcoes.js = funções de criar app, listar, evoluir\n- inteligencia.js = fusão Gemini + Groq + Pollinations\n- sistema.md = regras do sistema\n');
-
-  // 3. PASTAS BASE - só cria se não existir, não duplica
-  await enviarArquivo('apps/.gitkeep','K-AI Apps - pasta auto-organizada');
-  await enviarArquivo('data/.gitkeep','K-AI Data');
-  await enviarArquivo('README.md','# K-AI APP\n\nApp Mãe auto-evoluível\nFusão Gemini + Groq + Pollinations como 1 única IA\nCérebro em brain/\n\nAbrir: https://korvil-app.github.io/k-ai-app/kai-app.html');
-
-  log('--- PRONTO V2 ---');
-  log('✅ Arquivos atualizados, nada duplicado');
-  log('✅ Cérebro criado em brain/');
-  log('✅ Abre: https://korvil-app.github.io/k-ai-app/kai-app.html');
-  log('⚠️ Revoga o token agora!');
-  TOKEN=""; document.getElementById('token').value="";
-  btn.innerText='🚀 ATUALIZAR TUDO + CRIAR CÉREBRO';
-  btn.disabled=false;
-}
 </script>
 </body>
 </html>
