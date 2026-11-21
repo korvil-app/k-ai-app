@@ -1,5 +1,7 @@
 # K-AI APP
 
-App Mãe - Fusão Gemini + Groq + Pollinations + GitHub
+App Mãe auto-evoluível
+Fusão Gemini + Groq + Pollinations como 1 única IA
+Cérebro em brain/
 
-Link: https://korvil-app.github.io/k-ai-app/
+Abrir: https://korvil-app.github.io/k-ai-app/kai-app.html
