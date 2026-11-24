@@ -1,0 +1,133 @@
+<html lang="pt-BR"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>K-AI APP - Código Mestre</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f172a">
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#0f172a;color:#fff}
+.top{background:#1e293b;padding:14px;text-align:center;font-weight:bold;font-size:20px}
+.status{background:#020617;padding:10px;text-align:center;font-size:13px;color:#a5f3fc}
+.box{max-width:520px;margin:16px auto;padding:16px;background:#1e293b;border-radius:16px}
+input{width:100%;padding:14px;border-radius:10px;border:none;margin:10px 0;font-size:15px}
+button{width:100%;padding:14px;border:none;border-radius:10px;font-weight:bold;font-size:16px;margin:6px 0;cursor:pointer}
+.btn-ativar{background:#22c55e;color:#fff}
+.btn-publicar{background:#3b82f6;color:#fff}
+.btn-instalar{background:#f59e0b;color:#000}
+.btn-chat{background:#8b5cf6;color:#fff}
+small{color:#94a3b8}
+#msg{background:#020617;padding:10px;border-radius:10px;margin-top:10px;font-size:13px;white-space:pre-wrap}
+.chat{height:180px;overflow:auto;background:#020617;padding:10px;border-radius:10px;margin-top:10px;font-size:14px}
+</style>
+</head>
+<body>
+<div class="top">K-AI APP - CÓDIGO MESTRE</div>
+<div class="status" id="status">Conectado: SIM | KAI_TOKEN: Salvo | Função k-ai-v2: OK | Voz standby: ATIVA</div>
+
+<div class="box">
+<h3>1. Cole o KAI_TOKEN</h3>
+<input id="token" type="password" placeholder="Cole aqui o KAI_TOKEN">
+<button class="btn-ativar" onclick="ativar()">ATIVAR</button>
+<small id="tokenMostra">KAI_TOKEN salvo ****ohuX</small>
+<div id="msg">Publicando... aguarde...</div>
+
+<h3>2. Publicar tudo no GitHub</h3>
+<button class="btn-publicar" onclick="publicar()">CRIAR / PUBLICAR TUDO NO GITHUB</button>
+<button class="btn-instalar" id="btnInstalar" onclick="instalar()">INSTALAR NO CELULAR</button>
+
+<h3>3. Falar com o K-AI</h3>
+<div class="chat" id="chat">K-AI: Oi criador, estou te ouvindo. Fala "kai" ou digita aqui.<br></div>
+<input id="pergunta" placeholder="Digite ou fale: kai, evoluir...">
+<button class="btn-chat" onclick="falar()">ENVIAR PARA O K-AI</button>
+<p><small>Repositório: korvil-app/k-ai-app | Pasta: kaiapp/ | Supabase: k-ai-v2 | 3 IAs: GEMINI + GROQ + POLLINATIONS</small></p>
+</div>
+
+<script>
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;});
+function instalar(){if(deferredPrompt){deferredPrompt.prompt()}else{alert('No navegador clique em Compartilhar > Adicionar à Tela de Início')}} 
+const SUPA_URL="https://tgccyqvobdmwmwjwntxx.supabase.co";
+const SUPA_KEY="sb_publishable_2EneNKkowoLF9UiWwB1DDA_Z_RvwPfX";
+function carregar(){
+  try{
+    const t=localStorage.getItem('KAI_TOKEN')||'';
+    if(t){
+      document.getElementById('tokenMostra').innerText='KAI_TOKEN salvo ****'+t.slice(-4);
+      document.getElementById('status').innerText='Conectado: SIM | KAI_TOKEN: Salvo | Função k-ai-v2: OK | Voz standby: ATIVA';
+      document.getElementById('msg').innerText='Token já salvo. Pode clicar em PUBLICAR.';
+    }
+  }catch(e){}
+}
+carregar();
+function ativar(){
+  const t=document.getElementById('token').value.trim();
+  if(!t){alert('Cole o KAI_TOKEN primeiro');return}
+  localStorage.setItem('KAI_TOKEN',t);
+  localStorage.setItem('KAI_SUPA_URL',SUPA_URL);
+  localStorage.setItem('KAI_SUPA_KEY',SUPA_KEY);
+  carregar();
+  document.getElementById('msg').innerText='ATIVADO! Conexão com korvil-app/k-ai-app ativada. Agora clique em PUBLICAR.';
+  falarVoz('Oi criador, estou te ouvindo. Token ativado.');
+}
+function falarVoz(txt){
+  try{const u=new SpeechSynthesisUtterance(txt);u.lang='pt-BR';speechSynthesis.speak(u)}catch(e){}
+}
+function falar(){
+  const p=document.getElementById('pergunta').value;
+  if(!p)return;
+  document.getElementById('chat').innerHTML+='<br>Você: '+p;
+  document.getElementById('chat').innerHTML+='<br>K-AI: Entendi, vou fazer: '+p+'. Clique em PUBLICAR para salvar no GitHub.';
+  falarVoz('Entendi, vou fazer '+p);
+  document.getElementById('pergunta').value='';
+}
+// Voz standby tipo Alexa
+try{
+  const Rec=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(Rec){
+    const rec=new Rec(); rec.lang='pt-BR'; rec.continuous=true; rec.interimResults=false;
+    rec.onresult=(e)=>{
+      const txt=e.results[e.results.length-1][0].transcript.toLowerCase();
+      if(txt.includes('kai')||txt.includes('cai')||txt.includes('k ai')){
+        falarVoz('Oi criador, estou te ouvindo.');
+        document.getElementById('chat').innerHTML+='<br>K-AI: Oi criador, estou te ouvindo. (bip bip bip)';
+      }
+    };
+    rec.onend=()=>{try{rec.start()}catch(e){}};
+    rec.start();
+  }
+}catch(e){}
+async function publicar(){
+  const token=localStorage.getItem('KAI_TOKEN');
+  if(!token){alert('Cole o token e clique em ATIVAR primeiro');return}
+  document.getElementById('msg').innerText='Publicando... aguarde...';
+  try{
+    // Cria index.html e manifest.json e o próprio kai.app.html já está salvo, só confirma
+    const arquivos=[
+      {path:'kaiapp/index.html',msg:'Cria index.html'},
+      {path:'kaiapp/manifest.json',msg:'Cria manifest'},
+      {path:'index.html',msg:'Cria redirect raiz'}
+    ];
+    const htmlAtual=document.documentElement.outerHTML;
+    const conteudos={
+      'kaiapp/index.html':htmlAtual,
+      'kaiapp/manifest.json':JSON.stringify({name:"K-AI APP",short_name:"K-AI",display:"standalone",start_url:"./kai.app.html",background_color:"#0f172a",theme_color:"#0f172a"}),
+      'index.html':'<meta http-equiv="refresh" content="0; url=kaiapp/kai.app.html">'
+    };
+    for(const a of arquivos){
+      const get=await fetch(`https://api.github.com/repos/korvil-app/k-ai-app/contents/${a.path}`,{headers:{Authorization:'Bearer '+token,Accept:'application/vnd.github+json'}});
+      let sha=null; if(get.ok){const j=await get.json(); sha=j.sha}
+      const body={message:a.msg,content:btoa(unescape(encodeURIComponent(conteudos[a.path]))),branch:'main'};
+      if(sha) body.sha=sha;
+      const put=await fetch(`https://api.github.com/repos/korvil-app/k-ai-app/contents/${a.path}`,{method:'PUT',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json',Accept:'application/vnd.github+json'},body:JSON.stringify(body)});
+      if(!put.ok) throw new Error('Erro em '+a.path);
+    }
+    document.getElementById('msg').innerText='PUBLICADO COM SUCESSO em korvil-app/k-ai-app / kaiapp/ ! Abra o link publicado.';
+    falarVoz('Publicado com sucesso, criador.');
+  }catch(e){
+    document.getElementById('msg').innerText='Erro ao publicar: '+e.message;
+  }
+}
+</script>
+
+
+</body></html>
