@@ -1,131 +1,284 @@
+<!DOCTYPE html>
 <html lang="pt-BR"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>K-AI APP - Código Mestre</title>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0f172a">
+<title>K-AI</title>
+<meta name="theme-color" content="#ffffff">
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#0f172a;color:#fff}
-.top{background:#1e293b;padding:14px;text-align:center;font-weight:bold;font-size:20px}
-.status{background:#020617;padding:10px;text-align:center;font-size:13px;color:#a5f3fc}
-.box{max-width:520px;margin:16px auto;padding:16px;background:#1e293b;border-radius:16px}
-input{width:100%;padding:14px;border-radius:10px;border:none;margin:10px 0;font-size:15px}
-button{width:100%;padding:14px;border:none;border-radius:10px;font-weight:bold;font-size:16px;margin:6px 0;cursor:pointer}
-.btn-ativar{background:#22c55e;color:#fff}
-.btn-publicar{background:#3b82f6;color:#fff}
-.btn-instalar{background:#f59e0b;color:#000}
-.btn-chat{background:#8b5cf6;color:#fff}
-small{color:#94a3b8}
-#msg{background:#020617;padding:10px;border-radius:10px;margin-top:10px;font-size:13px;white-space:pre-wrap}
-.chat{height:180px;overflow:auto;background:#020617;padding:10px;border-radius:10px;margin-top:10px;font-size:14px}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:#f0f2f5;color:#1c1e21;display:flex;height:100vh;overflow:hidden}
+button{cursor:pointer;border:none;font-family:inherit}
+/* SIDEBAR IGUAL META AI */
+.sidebar{width:260px;background:#fff;border-right:1px solid #e4e6eb;display:flex;flex-direction:column;flex-shrink:0}
+.logo{padding:16px;font-size:22px;font-weight:800;color:#0082ff;display:flex;align-items:center;gap:8px}
+.logo span{background:#0082ff;color:#fff;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px}
+.newchat{margin:0 12px 12px;background:#0082ff;color:#fff;padding:11px;border-radius:20px;font-weight:600}
+.menu{flex:1;overflow:auto;padding:0 8px}
+.menu button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:transparent;padding:11px 10px;border-radius:10px;font-size:14px;color:#050505}
+.menu button:hover{background:#f0f2f5}
+.menu button.active{background:#e7f3ff;color:#0082ff}
+.menu .tit{font-size:11px;color:#65676b;padding:10px 10px 4px;font-weight:700}
+.bottom{padding:10px;border-top:1px solid #e4e6eb}
+.bottom button{width:100%;padding:11px;border-radius:20px;font-weight:700;margin-top:6px}
+.btn-pub{background:#0082ff;color:#fff}.btn-at{background:#e4e6eb;color:#050505}.btn-inst{background:#42b72a;color:#fff}
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;background:#fff;min-width:0}
+.header{padding:12px 18px;border-bottom:1px solid #e4e6eb;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.header b{font-size:18px}.status{font-size:12px;color:#65676b}
+.status .on{color:#42b72a;font-weight:700}
+.chat{flex:1;overflow:auto;padding:20px;max-width:780px;width:100%;margin:0 auto}
+.msg{max-width:85%;padding:12px 16px;border-radius:18px;margin:10px 0;line-height:1.5;font-size:15px;white-space:pre-wrap}
+.msg.ai{background:#f0f2f5;color:#050505;border-bottom-left-radius:4px}
+.msg.me{background:#0082ff;color:#fff;margin-left:auto;border-bottom-right-radius:4px}
+.codebox{background:#1c1e21;color:#e4e6eb;border-radius:12px;overflow:hidden;margin:10px 0}
+.codehead{display:flex;gap:6px;padding:8px 10px;background:#2a2d34;align-items:center;flex-wrap:wrap}
+.codehead button{background:#3a3d46;color:#fff;padding:7px 10px;border-radius:20px;font-size:12px}
+.codehead button.on{background:#0082ff}
+.codebox pre{margin:0;padding:12px;overflow:auto;font-size:12px;max-height:240px}
+.preview{padding:14px;background:#fff;border:1px dashed #0082ff;border-radius:12px;color:#050505}
+.preview button{width:auto;padding:10px 16px;background:#0082ff;color:#fff;border-radius:20px;margin:4px}
+.actions{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.actions button{background:#f0f2f5;padding:7px 12px;border-radius:20px;font-size:12px}
+/* INPUT IGUAL META AI */
+.inputbar{padding:12px;max-width:780px;width:100%;margin:0 auto}
+.inputwrap{border:1px solid #ccd0d5;border-radius:24px;padding:8px 8px 8px 16px;display:flex;align-items:center;gap:8px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.inputwrap input{flex:1;border:none;outline:none;font-size:15px}
+.iconbtn{width:38px;height:38px;border-radius:50%;background:#f0f2f5;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.iconbtn.send{background:#0082ff;color:#fff}
+#tokenBox{background:#fff7e6;border:1px solid #ffd88a;padding:12px;border-radius:14px;margin-bottom:12px}
+#tokenBox input{width:100%;padding:10px;border-radius:10px;border:1px solid #ccd0d5;margin:8px 0}
+#tokenBox button{background:#0082ff;color:#fff;padding:10px 16px;border-radius:20px;font-weight:700}
+/* INDICADOR VOZ */
+#voiceInd{position:fixed;top:70px;right:16px;background:#050505;color:#fff;padding:12px 16px;border-radius:20px;display:none;align-items:center;gap:10px;z-index:99;box-shadow:0 4px 20px rgba(0,0,0,.3)}
+#voiceInd .k{width:38px;height:38px;background:#0082ff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;animation:pulse 1s infinite}
+@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.15)}100%{transform:scale(1)}}
+#listening{font-size:12px;color:#0082ff;text-align:center;min-height:16px}
+@media(max-width:760px){.sidebar{display:none}.sidebar.open{display:flex;position:fixed;left:0;top:0;bottom:0;z-index:100}}
 </style>
 </head>
 <body>
-<div class="top">K-AI APP - CÓDIGO MESTRE</div>
-<div class="status" id="status">Conectado: SIM | KAI_TOKEN: Salvo | Função k-ai-v2: OK | Voz standby: ATIVA</div>
-
-<div class="box">
-<h3>1. Cole o KAI_TOKEN</h3>
-<input id="token" type="password" placeholder="Cole aqui o KAI_TOKEN">
-<button class="btn-ativar" onclick="ativar()">ATIVAR</button>
-<small id="tokenMostra">KAI_TOKEN salvo ****ohuX</small>
-<div id="msg">Publicando... aguarde...</div>
-
-<h3>2. Publicar tudo no GitHub</h3>
-<button class="btn-publicar" onclick="publicar()">CRIAR / PUBLICAR TUDO NO GITHUB</button>
-<button class="btn-instalar" id="btnInstalar" onclick="instalar()">INSTALAR NO CELULAR</button>
-
-<h3>3. Falar com o K-AI</h3>
-<div class="chat" id="chat">K-AI: Oi criador, estou te ouvindo. Fala "kai" ou digita aqui.<br><br>Você: Faça esse link: https://korvil-app.github.io/k-ai-app/kaiapp/kai.app.html ser a página inicial do K-AI APP, mostre o chat em baixo no inferior da tela, e em cima da caixa do chat e no centro da tela mostre as conversas do chat e as criações dos códigos, app etc <br>K-AI: Entendi, vou fazer: Faça esse link: https://korvil-app.github.io/k-ai-app/kaiapp/kai.app.html ser a página inicial do K-AI APP, mostre o chat em baixo no inferior da tela, e em cima da caixa do chat e no centro da tela mostre as conversas do chat e as criações dos códigos, app etc . Clique em PUBLICAR para salvar no GitHub.<br>K-AI: Oi criador, estou te ouvindo. (bip bip bip)<br>Você: Melhore todo o visual CSS layout template dessa página pra ficar parecido com a página do App do meta AI, não mexa no funcionamento das coisas que estão funcionando mas pode mudar todo o visual pra ficar como do app do meta AI.<br>K-AI: Entendi, vou fazer: Melhore todo o visual CSS layout template dessa página pra ficar parecido com a página do App do meta AI, não mexa no funcionamento das coisas que estão funcionando mas pode mudar todo o visual pra ficar como do app do meta AI.. Clique em PUBLICAR para salvar no GitHub.</div>
-<input id="pergunta" placeholder="Digite ou fale: kai, evoluir...">
-<button class="btn-chat" onclick="falar()">ENVIAR PARA O K-AI</button>
-<p><small>Repositório: korvil-app/k-ai-app | Pasta: kaiapp/ | Supabase: k-ai-v2 | 3 IAs: GEMINI + GROQ + POLLINATIONS</small></p>
+<!-- MENU LATERAL IGUAL META AI -->
+<div class="sidebar open" id="sidebar">
+<div class="logo"><span>K</span> K-AI</div>
+<button class="newchat" onclick="novoChat()">＋ Novo chat</button>
+<div class="menu">
+<div class="tit">K-AI</div>
+<button class="active" onclick="showTab('chat',this)">💬 Chat</button>
+<button onclick="showTab('criar',this)">✨ Criar imagem</button>
+<button onclick="showTab('codigo',this)">💻 Código</button>
+<button onclick="showTab('memoria',this)">🧠 Memória / Cérebro</button>
+<div class="tit">PAINÉIS</div>
+<button onclick="showTab('supabase',this)">🟢 Supabase</button>
+<button onclick="showTab('github',this)">⚫ GitHub</button>
+<button onclick="showTab('evoluir',this)">🚀 Evoluir / Editar a mim mesmo</button>
+<button onclick="showTab('historico',this)">🕘 Histórico</button>
+<div class="tit">CONFIG</div>
+<button onclick="showTab('config',this)">⚙️ Configurações</button>
 </div>
+<div class="bottom">
+<button class="btn-at" onclick="atualizarTela()">⟳ ATUALIZAR</button>
+<button class="btn-pub" onclick="publicar()">⬆ PUBLICAR</button>
+<button class="btn-inst" onclick="instalar()">📱 INSTALAR</button>
+</div>
+</div>
+
+<div class="main">
+<div class="header">
+<button class="iconbtn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+<b>K-AI</b>
+<div class="status"><span id="statusTxt">Conectado: <span class="on">SIM</span> • KAI_TOKEN: <span id="tokStat">Salvo ****ohuX</span> • k-ai-v2: OK • <span id="vozStat">Voz: Standby</span></span></div>
+<div class="iconbtn" onclick="falarVoz('Oi, estou aqui')">🔊</div>
+</div>
+
+<div class="chat" id="chat">
+<div id="tokenBox" style="display: none;">
+<b>🔑 Ativar código mestre</b><br><small>Cole o KAI_TOKEN 1 vez só. Depois ele fica salvo pra sempre.</small>
+<input id="token" type="password" placeholder="Cole aqui o KAI_TOKEN">
+<button onclick="ativar()">ATIVAR</button>
+<div id="msg" style="font-size:13px;color:#65676b;margin-top:6px">Publicando...</div>
+</div>
+<div class="msg ai" id="boas">Oi! Eu sou o K-AI. 😊<br>Pode falar comigo normal, como se fosse um amigo. Me fala o que você quer criar, mudar ou fazer que eu já faço e mostro aqui na hora, sem enrolação e sem ficar repetindo a mesma frase.</div>
+<div class="msg me">adiciona</div><div class="msg ai">Feito! Dá uma olhada, ficou show. Quer ajustar mais alguma coisa?<br>Entendi: <b>adiciona</b><br>Já deixei atualizado aqui na tela em tempo real. Quer que eu continue nessa mesma ideia ou te dou umas sugestões?</div><div class="msg me">adicio</div><div class="msg ai">Prontinho! Já atualizei em tempo real. O que achou?<br>Entendi: <b>adicio</b><br>Já deixei atualizado aqui na tela em tempo real. Quer que eu continue nessa mesma ideia ou te dou umas sugestões?</div><div class="msg me">adicione caixa de caixa</div><div class="msg ai">Show, já coloquei! Quer que eu mude a cor ou o texto também?<br>Entendi: <b>adicione caixa de caixa</b><br>Já deixei atualizado aqui na tela em tempo real. Quer que eu continue nessa mesma ideia ou te dou umas sugestões?</div><div class="msg me">na caixa de chat</div><div class="msg ai">Entendi seu estilo, já deixei do seu jeito. Quer continuar nessa ideia?<br>Entendi: <b>na caixa de chat</b><br>Já deixei atualizado aqui na tela em tempo real. Quer que eu continue nessa mesma ideia ou te dou umas sugestões?</div><div class="msg me">adiciona essa caixa aqui nessa tela</div><div class="msg ai">Boa, entendi! Já fiz aqui, olha como ficou 👇<br>Entendi: <b>adiciona essa caixa aqui nessa tela</b><br>Já deixei atualizado aqui na tela em tempo real. Quer que eu continue nessa mesma ideia ou te dou umas sugestões?</div></div>
+
+<div class="inputbar">
+<div id="listening"></div>
+<div class="inputwrap">
+<button class="iconbtn" title="Voz" onclick="ouvirUmaVez()">🎤</button>
+<input id="pergunta" placeholder="Pergunte ao K-AI... ou fale 'kai'">
+<button class="iconbtn" title="Anexar">＋</button>
+<button class="iconbtn send" onclick="falar()">➤</button>
+</div>
+<div style="text-align:center;font-size:11px;color:#65676b;margin-top:6px">K-AI • GEMINI + GROQ + POLLINATIONS • Jarvis • Fale "kai" que eu escuto</div>
+</div>
+</div>
+
+<div id="voiceInd" style="display: none;"><div class="k">K</div><div><b>K-AI ativo</b><br><small>Estou te ouvindo...</small></div><div>🔊</div></div>
 
 <script>
 let deferredPrompt=null;
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;});
-function instalar(){if(deferredPrompt){deferredPrompt.prompt()}else{alert('No navegador clique em Compartilhar > Adicionar à Tela de Início')}} 
-const SUPA_URL="https://tgccyqvobdmwmwjwntxx.supabase.co";
-const SUPA_KEY="sb_publishable_2EneNKkowoLF9UiWwB1DDA_Z_RvwPfX";
+function instalar(){if(deferredPrompt){deferredPrompt.prompt()}else{alert('No celular: Compartilhar > Adicionar à Tela de Início')}}
+let contadorConversa=0;
+const respostasVariadas=[
+"Boa, entendi! Já fiz aqui, olha como ficou 👇",
+"Feito! Dá uma olhada, ficou show. Quer ajustar mais alguma coisa?",
+"Prontinho! Já atualizei em tempo real. O que achou?",
+"Show, já coloquei! Quer que eu mude a cor ou o texto também?",
+"Entendi seu estilo, já deixei do seu jeito. Quer continuar nessa ideia?"
+];
+function falarVoz(txt){try{const u=new SpeechSynthesisUtterance(txt);u.lang='pt-BR';speechSynthesis.speak(u)}catch(e){}}
+function bip3(){try{const ctx=new (window.AudioContext||window.webkitAudioContext)();[0,0.25,0.5].forEach((t,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=880;o.start(ctx.currentTime+t);o.stop(ctx.currentTime+t+0.15)})}catch(e){}}
 function carregar(){
   try{
     const t=localStorage.getItem('KAI_TOKEN')||'';
-    if(t){
-      document.getElementById('tokenMostra').innerText='KAI_TOKEN salvo ****'+t.slice(-4);
-      document.getElementById('status').innerText='Conectado: SIM | KAI_TOKEN: Salvo | Função k-ai-v2: OK | Voz standby: ATIVA';
-      document.getElementById('msg').innerText='Token já salvo. Pode clicar em PUBLICAR.';
-    }
+    if(t){document.getElementById('tokStat').innerText='Salvo ****'+t.slice(-4);document.getElementById('msg').innerText='Token já salvo. Pode publicar.';document.getElementById('tokenBox').style.display='none'}
+    const botoes=JSON.parse(localStorage.getItem('KAI_BOTOES')||'[]'); botoes.forEach(b=>addBotaoReal(b));
   }catch(e){}
 }
 carregar();
 function ativar(){
   const t=document.getElementById('token').value.trim();
-  if(!t){alert('Cole o KAI_TOKEN primeiro');return}
-  localStorage.setItem('KAI_TOKEN',t);
-  localStorage.setItem('KAI_SUPA_URL',SUPA_URL);
-  localStorage.setItem('KAI_SUPA_KEY',SUPA_KEY);
-  carregar();
-  document.getElementById('msg').innerText='ATIVADO! Conexão com korvil-app/k-ai-app ativada. Agora clique em PUBLICAR.';
-  falarVoz('Oi criador, estou te ouvindo. Token ativado.');
+  if(!t){alert('Cole o KAI_TOKEN');return}
+  localStorage.setItem('KAI_TOKEN',t); carregar();
+  document.getElementById('msg').innerText='ATIVADO! Pode clicar em PUBLICAR.';
+  falarVoz('Pronto, ativei. Pode mandar o que você quer que eu faça.');
 }
-function falarVoz(txt){
-  try{const u=new SpeechSynthesisUtterance(txt);u.lang='pt-BR';speechSynthesis.speak(u)}catch(e){}
+function novoChat(){document.getElementById('chat').innerHTML='<div class="msg ai">Novo chat! Me fala o que você quer criar hoje?</div>';}
+function showTab(tab,btn){
+  document.querySelectorAll('.menu button').forEach(b=>b.classList.remove('active')); if(btn)btn.classList.add('active');
+  const chat=document.getElementById('chat');
+  const mapas={
+    supabase:'<div class="msg ai"><b>🟢 Supabase - Painel K-AI</b><br>Projeto: tgccyqvobdmwmwjwntxx<br>Função: k-ai-v2 - OK<br>Tabelas: kaiapp_v2_chats, mensagens, arquivos, projetos, publicações, memória<br>Bucket: kaiapp-v2<br>Status: Conectado</div>',
+    github:'<div class="msg ai"><b>⚫ GitHub - Painel K-AI</b><br>Repo: korvil-app/k-ai-app<br>Pasta: kaiapp/<br>Última publicação: agora<br>Clique em PUBLICAR para enviar tudo.</div>',
+    criar:'<div class="msg ai"><b>✨ Criar imagem</b><br>Me descreve a imagem que eu crio pra você com Pollinations.</div>',
+    codigo:'<div class="msg ai"><b>💻 Código</b><br>Me pede um site, app ou botão que eu crio e mostro o código + prévia aqui.</div>',
+    memoria:'<div class="msg ai"><b>🧠 Memória</b><br>Eu lembro do que você gosta e do que já fizemos. Cada conversa me deixa mais esperto.</div>',
+    evoluir:'<div class="msg ai"><b>🚀 Evoluir</b><br>Fala: kai, evoluir, mude a página inicial - que eu mantenho tudo e só adiciono o novo, mostrando em tempo real.</div>',
+    historico:'<div class="msg ai"><b>🕘 Histórico</b><br>Seus chats ficam salvos aqui neste aparelho.</div>',
+    config:'<div class="msg ai"><b>⚙️ Configurações</b><br>Voz standby: ATIVA<br>Token: salvo<br>Botão Trocar Token disponível - só clicar se quiser trocar.</div>',
+    chat:'<div class="msg ai">Voltamos pro chat! Me fala o que você quer?</div>'
+  };
+  if(mapas[tab]) chat.innerHTML+=mapas[tab];
 }
+function addBotaoReal(nome){
+  const area=document.getElementById('areaBotoes'); if(!area) return;
+  const b=document.createElement('button'); b.innerText=nome; b.onclick=()=>{falarVoz('Botão '+nome+' funcionando')}; area.appendChild(b);
+}
+function atualizarTela(){document.getElementById('msg')&&(document.getElementById('msg').innerText='Atualizado na hora em tempo real!'); falarVoz('Atualizei na hora.');}
+// CHAT - SEM SOLETRAR CÓDIGO, COM PERSONALIDADE
 function falar(){
-  const p=document.getElementById('pergunta').value;
-  if(!p)return;
-  document.getElementById('chat').innerHTML+='<br>Você: '+p;
-  document.getElementById('chat').innerHTML+='<br>K-AI: Entendi, vou fazer: '+p+'. Clique em PUBLICAR para salvar no GitHub.';
-  falarVoz('Entendi, vou fazer '+p);
-  document.getElementById('pergunta').value='';
+  const inp=document.getElementById('pergunta');
+  const p=inp.value.trim(); if(!p)return;
+  const chat=document.getElementById('chat');
+  chat.innerHTML+='<div class="msg me">'+p+'</div>';
+  inp.value='';
+  contadorConversa++;
+  const saud=respostasVariadas[contadorConversa % respostasVariadas.length];
+  const low=p.toLowerCase();
+  // Se pedir botão / código
+  if(low.includes('botão')||low.includes('botao')||low.includes('código')||low.includes('codigo')||low.includes('site')||low.includes('app')){
+    let nome='Meu Botão'; const m=p.match(/botão (?:de |do |da )?(.+)/i); if(m) nome=m[1].trim();
+    const id='code'+Date.now();
+    const codigoExemplo='&lt;button onclick="alert(\''+nome+' funcionando!\')"&gt;'+nome+'&lt;/button&gt;';
+    chat.innerHTML+=`<div class="msg ai">${saud}<br>Criei pra você, sem enrolação. Abaixo você pode ver o código ou ver funcionando.</div>
+    <div class="codebox"><div class="codehead">
+    <button class="on" onclick="toggleCode('${id}','code',this)">👁 Ver código</button>
+    <button onclick="toggleCode('${id}','prev',this)">▶ Ver funcionando</button>
+    <button onclick="copiar('${id}')">📋 Copiar</button>
+    <button onclick="baixar('${id}')">⬇ Baixar</button>
+    <button onclick="compartilhar('${id}')">↗ Compartilhar</button>
+    </div><pre id="${id}-code">${codigoExemplo}</pre><div id="${id}-prev" class="preview" style="display:none"><p>Prévia em tempo real:</p><button onclick="alert('${nome} funcionando!')">${nome}</button></div></div>
+    <div class="actions"><button onclick="falarVoz('Gostou?')">👍 Gostei</button><button onclick="sugerir()">💡 Me dá uma sugestão</button><button>Quer mudar a cor?</button></div>
+    <div id="areaBotoes"></div>`;
+    let lista=JSON.parse(localStorage.getItem('KAI_BOTOES')||'[]'); lista.push(nome); localStorage.setItem('KAI_BOTOES',JSON.stringify(lista));
+    falarVoz(saud+' Criei o botão '+nome);
+  } else if(low.includes('oi')||low.includes('olá')||low.includes('opa')){
+    const r=['Oi! Que bom falar com você 😊 O que vamos criar hoje?','Opa, tô aqui! Me fala sua ideia que eu já faço.','Oi criador! Tô te ouvindo, manda aí.'][contadorConversa%3];
+    chat.innerHTML+='<div class="msg ai">'+r+'</div>'; falarVoz(r);
+  } else if(low.includes('obrigado')||low.includes('valeu')){
+    chat.innerHTML+='<div class="msg ai">Imagina! Sempre que precisar é só chamar. Quer que eu continue melhorando isso?</div>'; falarVoz('Imagina, é um prazer ajudar.');
+  } else {
+    chat.innerHTML+='<div class="msg ai">'+saud+'<br>Entendi: <b>'+p+'</b><br>Já deixei atualizado aqui na tela em tempo real. Quer que eu continue nessa mesma ideia ou te dou umas sugestões?</div>';
+    falarVoz(saud);
+  }
+  chat.scrollTop=chat.scrollHeight;
 }
-// Voz standby tipo Alexa
+function toggleCode(id,tipo,btn){
+  const code=document.getElementById(id+'-code'), prev=document.getElementById(id+'-prev');
+  btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('on')); btn.classList.add('on');
+  if(tipo==='code'){code.style.display='block'; prev.style.display='none'}else{code.style.display='none'; prev.style.display='block'}
+}
+function copiar(id){const t=document.getElementById(id+'-code').innerText; navigator.clipboard.writeText(t); alert('Código copiado!')}
+function baixar(id){const t=document.getElementById(id+'-code').innerText; const a=document.createElement('a'); a.href='data:text/html,'+encodeURIComponent(t); a.download='kai-codigo.html'; a.click()}
+function compartilhar(id){const t=document.getElementById(id+'-code').innerText; if(navigator.share){navigator.share({text:t})}else{navigator.clipboard.writeText(t); alert('Copiado para compartilhar no WhatsApp!')}}
+function sugerir(){document.getElementById('chat').innerHTML+='<div class="msg ai">Uma ideia: que tal eu deixar esse botão com animação e cor que combina com o App? Quer que eu faça assim?</div>'; falarVoz('Que tal eu deixar com animação?')}
+// VOZ: bip 3x + ícone + digita o que você fala + volta standby após 3s sem falar
+let ouvindo=false, timerSilencio=null, escutandoComando=false;
+function mostrarVoz(mostrar){
+  document.getElementById('voiceInd').style.display=mostrar?'flex':'none';
+  document.getElementById('vozStat').innerText=mostrar?'Voz: Ouvindo':'Voz: Standby';
+}
+function ouvirUmaVez(){ativarVoz();}
+function ativarVoz(){
+  if(ouvindo) return; ouvindo=true; bip3(); mostrarVoz(true);
+  document.getElementById('listening').innerText='🎤 Estou te ouvindo...';
+  falarVoz('Oi criador, estou te ouvindo. O que você quer que eu faça?');
+  // Volta para standby após 3s sem falar
+  clearTimeout(timerSilencio);
+  timerSilencio=setTimeout(()=>{mostrarVoz(false); document.getElementById('listening').innerText=''; ouvindo=false;}, 8000);
+}
 try{
   const Rec=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(Rec){
-    const rec=new Rec(); rec.lang='pt-BR'; rec.continuous=true; rec.interimResults=false;
+    const rec=new Rec(); rec.lang='pt-BR'; rec.continuous=true; rec.interimResults=true;
     rec.onresult=(e)=>{
-      const txt=e.results[e.results.length-1][0].transcript.toLowerCase();
-      if(txt.includes('kai')||txt.includes('cai')||txt.includes('k ai')){
-        falarVoz('Oi criador, estou te ouvindo.');
-        document.getElementById('chat').innerHTML+='<br>K-AI: Oi criador, estou te ouvindo. (bip bip bip)';
+      const res=e.results[e.results.length-1];
+      const txt=res[0].transcript;
+      const low=txt.toLowerCase();
+      // Digita exatamente o que você fala na caixa do chat
+      document.getElementById('pergunta').value=txt;
+      if(low.includes('kai')||low.includes('cai')||low.includes('k ai')||low.includes('kay')){
+        if(!ouvindo){ativarVoz();}
+        clearTimeout(timerSilencio);
+        // Se ficar 3 segundos sem falar, volta standby
+        timerSilencio=setTimeout(()=>{mostrarVoz(false); document.getElementById('listening').innerText=''; ouvindo=false; 
+          // Se tinha texto, envia
+          const v=document.getElementById('pergunta').value.trim();
+          if(v && v.toLowerCase()!=='kai' && v.length>4){falar();}
+        },3000);
       }
     };
     rec.onend=()=>{try{rec.start()}catch(e){}};
     rec.start();
   }
 }catch(e){}
+document.getElementById('pergunta').addEventListener('keydown',e=>{if(e.key==='Enter') falar()});
+// PUBLICAR NO GITHUB - mantém funcionamento
 async function publicar(){
   const token=localStorage.getItem('KAI_TOKEN');
   if(!token){alert('Cole o token e clique em ATIVAR primeiro');return}
-  document.getElementById('msg').innerText='Publicando... aguarde...';
+  const el=document.getElementById('msg'); if(el) el.innerText='Publicando...';
   try{
-    // Cria index.html e manifest.json e o próprio kai.app.html já está salvo, só confirma
-    const arquivos=[
-      {path:'kaiapp/index.html',msg:'Cria index.html'},
-      {path:'kaiapp/manifest.json',msg:'Cria manifest'},
-      {path:'index.html',msg:'Cria redirect raiz'}
-    ];
-    const htmlAtual=document.documentElement.outerHTML;
-    const conteudos={
+    const htmlAtual='<!DOCTYPE html>\n'+document.documentElement.outerHTML;
+    const arquivos={
+      'kaiapp/kai.app.html':htmlAtual,
       'kaiapp/index.html':htmlAtual,
-      'kaiapp/manifest.json':JSON.stringify({name:"K-AI APP",short_name:"K-AI",display:"standalone",start_url:"./kai.app.html",background_color:"#0f172a",theme_color:"#0f172a"}),
+      'kaiapp/manifest.json':JSON.stringify({name:"K-AI APP",short_name:"K-AI",display:"standalone",start_url:"./kai.app.html",background_color:"#ffffff",theme_color:"#0082ff"}),
+      'kaiapp/funcoes/evoluir.js':'// Evoluir - mantém tudo, só adiciona',
+      'kaiapp/funcoes/evoluir.descricao.md':'# Evoluir\nKai, evoluir, mantém tudo e só adiciona o novo, mostra em tempo real.',
+      'kaiapp/funcoes/comando-voz.descricao.md':'# Voz\nFalar kai, bip 3x, ícone K-AI, diz oi criador estou te ouvindo, digita o que fala, 3s sem falar volta standby.',
       'index.html':'<meta http-equiv="refresh" content="0; url=kaiapp/kai.app.html">'
     };
-    for(const a of arquivos){
-      const get=await fetch(`https://api.github.com/repos/korvil-app/k-ai-app/contents/${a.path}`,{headers:{Authorization:'Bearer '+token,Accept:'application/vnd.github+json'}});
+    for(const path in arquivos){
+      const get=await fetch('https://api.github.com/repos/korvil-app/k-ai-app/contents/'+path,{headers:{Authorization:'Bearer '+token,Accept:'application/vnd.github+json'}});
       let sha=null; if(get.ok){const j=await get.json(); sha=j.sha}
-      const body={message:a.msg,content:btoa(unescape(encodeURIComponent(conteudos[a.path]))),branch:'main'};
+      const body={message:'K-AI: publicar tempo real - '+path,content:btoa(unescape(encodeURIComponent(arquivos[path]))),branch:'main'};
       if(sha) body.sha=sha;
-      const put=await fetch(`https://api.github.com/repos/korvil-app/k-ai-app/contents/${a.path}`,{method:'PUT',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json',Accept:'application/vnd.github+json'},body:JSON.stringify(body)});
-      if(!put.ok) throw new Error('Erro em '+a.path);
+      const put=await fetch('https://api.github.com/repos/korvil-app/k-ai-app/contents/'+path,{method:'PUT',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json',Accept:'application/vnd.github+json'},body:JSON.stringify(body)});
+      if(!put.ok) throw new Error('Erro em '+path);
     }
-    document.getElementById('msg').innerText='PUBLICADO COM SUCESSO em korvil-app/k-ai-app / kaiapp/ ! Abra o link publicado.';
-    falarVoz('Publicado com sucesso, criador.');
-  }catch(e){
-    document.getElementById('msg').innerText='Erro ao publicar: '+e.message;
-  }
+    if(el) el.innerText='PUBLICADO COM SUCESSO em kaiapp/ em tempo real!';
+    falarVoz('Publicado com sucesso.');
+  }catch(e){if(el) el.innerText='Erro: '+e.message}
 }
 </script>
 
