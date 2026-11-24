@@ -1,7 +1,5 @@
-
 <!DOCTYPE html>
-<html lang="pt-BR">
-<head>
+<html lang="pt-BR"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>K-AI</title>
@@ -59,7 +57,7 @@ button{cursor:pointer;border:none;font-family:inherit}
 </head>
 <body>
 <!-- MENU LATERAL IGUAL META AI -->
-<div class="sidebar" id="sidebar">
+<div class="sidebar open" id="sidebar">
 <div class="logo"><span>K</span> K-AI</div>
 <button class="newchat" onclick="novoChat()">＋ Novo chat</button>
 <div class="menu">
@@ -87,19 +85,19 @@ button{cursor:pointer;border:none;font-family:inherit}
 <div class="header">
 <button class="iconbtn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
 <b>K-AI</b>
-<div class="status"><span id="statusTxt">Conectado: <span class="on">SIM</span> • KAI_TOKEN: <span id="tokStat">Não salvo</span> • k-ai-v2: OK • <span id="vozStat">Voz: Standby</span></span></div>
+<div class="status"><span id="statusTxt">Conectado: <span class="on">SIM</span> • KAI_TOKEN: <span id="tokStat">Salvo ****ohuX</span> • k-ai-v2: OK • <span id="vozStat">Voz: Standby</span></span></div>
 <div class="iconbtn" onclick="falarVoz('Oi, estou aqui')">🔊</div>
 </div>
 
 <div class="chat" id="chat">
-<div id="tokenBox">
+<div id="tokenBox" style="display: none;">
 <b>🔑 Ativar código mestre</b><br><small>Cole o KAI_TOKEN 1 vez só. Depois ele fica salvo pra sempre.</small>
 <input id="token" type="password" placeholder="Cole aqui o KAI_TOKEN">
 <button onclick="ativar()">ATIVAR</button>
-<div id="msg" style="font-size:13px;color:#65676b;margin-top:6px">Aguardando ativação...</div>
+<div id="msg" style="font-size:13px;color:#65676b;margin-top:6px">Publicando...</div>
 </div>
 <div class="msg ai" id="boas">Oi! Eu sou o K-AI. 😊<br>Pode falar comigo normal, como se fosse um amigo. Me fala o que você quer criar, mudar ou fazer que eu já faço e mostro aqui na hora, sem enrolação e sem ficar repetindo a mesma frase.</div>
-</div>
+<div class="msg me">adiciona</div><div class="msg ai">Feito! Dá uma olhada, ficou show. Quer ajustar mais alguma coisa?<br>Entendi: <b>adiciona</b><br>Já deixei atualizado aqui na tela em tempo real. Quer que eu continue nessa mesma ideia ou te dou umas sugestões?</div><div class="msg me">adicio</div><div class="msg ai">Prontinho! Já atualizei em tempo real. O que achou?<br>Entendi: <b>adicio</b><br>Já deixei atualizado aqui na tela em tempo real. Quer que eu continue nessa mesma ideia ou te dou umas sugestões?</div><div class="msg me">adicione caixa de caixa</div><div class="msg ai">Show, já coloquei! Quer que eu mude a cor ou o texto também?<br>Entendi: <b>adicione caixa de caixa</b><br>Já deixei atualizado aqui na tela em tempo real. Quer que eu continue nessa mesma ideia ou te dou umas sugestões?</div><div class="msg me">na caixa de chat</div><div class="msg ai">Entendi seu estilo, já deixei do seu jeito. Quer continuar nessa ideia?<br>Entendi: <b>na caixa de chat</b><br>Já deixei atualizado aqui na tela em tempo real. Quer que eu continue nessa mesma ideia ou te dou umas sugestões?</div><div class="msg me">adiciona essa caixa aqui nessa tela</div><div class="msg ai">Boa, entendi! Já fiz aqui, olha como ficou 👇<br>Entendi: <b>adiciona essa caixa aqui nessa tela</b><br>Já deixei atualizado aqui na tela em tempo real. Quer que eu continue nessa mesma ideia ou te dou umas sugestões?</div></div>
 
 <div class="inputbar">
 <div id="listening"></div>
@@ -113,7 +111,7 @@ button{cursor:pointer;border:none;font-family:inherit}
 </div>
 </div>
 
-<div id="voiceInd"><div class="k">K</div><div><b>K-AI ativo</b><br><small>Estou te ouvindo...</small></div><div>🔊</div></div>
+<div id="voiceInd" style="display: none;"><div class="k">K</div><div><b>K-AI ativo</b><br><small>Estou te ouvindo...</small></div><div>🔊</div></div>
 
 <script>
 let deferredPrompt=null;
@@ -283,5 +281,6 @@ async function publicar(){
   }catch(e){if(el) el.innerText='Erro: '+e.message}
 }
 </script>
-</body>
-</html>
+
+
+</body></html>
