@@ -101,7 +101,7 @@ let ordem=[
  {id:'bolt',nome:'BOLT',msg:'Projeto atualizado.',hora:'Ontem',cor:'#000',ini:'B'},
  {id:'github',nome:'GITHUB',msg:'Commit feito.',hora:'Ontem',cor:'#24292f',ini:'G'},
  {id:'supabase',nome:'SUPABASE',msg:'Banco salvo.',hora:'Ontem',cor:'#3ecf8e',ini:'S'},
- {id:'kai',nome:'K-AI',msg:'GEMINI + GROQ + POLLINATIONS',hora:'Agora',cor:'#7c4dff',ini:'K'},
+ {id:'kai',nome:'K-AI',msg:'K-AI = GEMINI + GROQ + POLLINATIONS (uma única IA)',hora:'Agora',cor:'#7c4dff',ini:'K'},
 ];
 let atual='kai';
 let historico={kai:[{me:false,txt:'Olá, criador! Sou o K-AI: Gemini cria, Groq melhora e corrige, Pollinations gera imagem. O que vamos criar?'}]};
@@ -131,7 +131,7 @@ function abrirChat(id){
  atual=id;let c=ordem.find(x=>x.id===id)||ordem[0];
  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));document.getElementById('s-chat').classList.add('on');
  document.getElementById('c-nome').innerText=c.nome;document.getElementById('c-av').innerText=c.ini;document.getElementById('c-av').style.background=c.cor;
- document.getElementById('c-sub').innerText=id==='kai'?'GEMINI + GROQ + POLLINATIONS • Modelos automáticos':'online';
+ document.getElementById('c-sub').innerText=id==='kai'?'K-AI = GEMINI + GROQ + POLLINATIONS (uma única IA) • Modelos automáticos':'online';
  document.getElementById('pubBox').style.display=id==='kai'?'block':'none';
  renderMsgs();
 }
@@ -149,13 +149,13 @@ async function enviar(){
  let inp=document.getElementById('texto');let txt=inp.value.trim();if(!txt)return;inp.value='';
  push(true,txt);
  if(atual!=='kai'){setTimeout(()=>push(false,'Recebido, criador! ✅'),600);return;}
- let th=document.getElementById('think');th.innerText='K-AI pensando... GEMINI + GROQ + POLLINATIONS';
+ let th=document.getElementById('think');th.innerText='K-AI pensando... K-AI = GEMINI + GROQ + POLLINATIONS (uma única IA)';
  try{
   const ctrl=new AbortController();const to=setTimeout(()=>ctrl.abort(),30000);
   const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pergunta:txt,tipo:'app'}),signal:ctrl.signal});clearTimeout(to);
   const j=await r.json().catch(()=>({}));
   th.innerText='';
-  if(j.ok&&j.codigo){push(false,'Pronto - GEMINI + GROQ + POLLINATIONS\n'+(j.modelo_usado||''),{codigo:j.codigo,html:j.imagem?`<img src="${j.imagem}" style="width:100%;border-radius:10px;margin-bottom:6px">`:''});}
+  if(j.ok&&j.codigo){push(false,'Pronto - K-AI = GEMINI + GROQ + POLLINATIONS (uma única IA)\n'+(j.modelo_usado||''),{codigo:j.codigo,html:j.imagem?`<img src="${j.imagem}" style="width:100%;border-radius:10px;margin-bottom:6px">`:''});}
   else{push(false,'K-AI sem conexão com a função k-ai-v2. Erro: '+(j.erro||('HTTP '+r.status)));}
  }catch(e){th.innerText='';push(false,'K-AI sem conexão com a função k-ai-v2. Erro: '+String(e));}
 }
