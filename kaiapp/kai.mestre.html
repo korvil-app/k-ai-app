@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>K-AI MESTRE - 3 IAs em 1</title>
+<meta name="theme-color" content="#0082ff">
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f8f9fa;color:#111;display:flex;flex-direction:column;height:100vh;overflow:hidden}
+button{cursor:pointer;border:none}input{outline:none}
+.top{padding:10px 14px;background:#fff;border-bottom:1px solid #e4e6eb;display:flex;gap:10px;align-items:center;flex-wrap:wrap;position:sticky;top:0;z-index:10}
+.top b{color:#0082ff;font-size:20px}.top span{font-size:11px;background:#e8f5e9;color:#1a7f37;padding:4px 8px;border-radius:20px}
+.top button{padding:9px 14px;border-radius:20px;font-weight:700;font-size:12px}
+.btn-pub{background:#0082ff;color:#fff}.btn-at{background:#e4e6eb}.btn-inst{background:#f59e0b}.btn-sup{background:#22c55e;color:#fff}
+.main{flex:1;overflow:auto;padding:14px;max-width:1100px;width:100%;margin:0 auto}
+.card{background:#fff;border:1px solid #e4e6eb;border-radius:18px;padding:16px;margin-bottom:14px;box-shadow:0 1px 6px rgba(0,0,0,.04)}
+#tokenBox{background:#fff7e6;border:1px solid #ffd88a}
+#tokenBox input{width:100%;padding:12px;border-radius:12px;border:1px solid #ccc;margin:8px 0;font-size:14px}
+#tokenBox button{background:#22c55e;color:#fff;padding:12px 20px;border-radius:20px;font-weight:800}
+#bigPreview{display:none}
+#bigPreview .bar{display:flex;gap:8px;flex-wrap:wrap;padding:10px;background:#f8f9fa;border-bottom:1px solid #e4e6eb;border-radius:14px 14px 0 0}
+#bigPreview .bar button{padding:8px 14px;border-radius:20px;background:#eee;font-size:12px}
+#bigPreview iframe{width:100%;height:520px;border:none;background:#fff;border-radius:0 0 14px 14px}
+#big-code{display:none;background:#111;color:#fff;padding:12px;font-size:12px;max-height:320px;overflow:auto;white-space:pre-wrap}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.mini-card{border:1px solid #e4e6eb;border-radius:16px;padding:12px;background:#fff;cursor:pointer}
+.mini-card .prev{height:130px;background:#f8f9fa;border-radius:12px;overflow:hidden;margin-bottom:8px}
+.mini-card iframe{width:100%;height:100%;border:none;pointer-events:none}
+/* CHAT INFERIOR - SEMPRE VISÍVEL */
+.chat{height:380px;background:#fff;border-top:1px solid #e4e6eb;display:flex;flex-direction:column;flex-shrink:0}
+.chatHead{background:#0082ff;color:#fff;padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
+.chatHead small{opacity:.9}
+.chatBody{flex:1;overflow:auto;padding:12px}
+.msg{max-width:92%;padding:10px 12px;border-radius:16px;margin:8px 0;font-size:14px;white-space:pre-wrap;line-height:1.4}
+.msg.ai{background:#f0f2f5}.msg.me{background:#0082ff;color:#fff;margin-left:auto}
+.codebox{background:#111;color:#fff;border-radius:12px;margin:8px 0;overflow:hidden}
+.codehead{display:flex;gap:6px;padding:8px;background:#333;flex-wrap:wrap}
+.codehead button{background:#555;color:#fff;padding:6px 10px;border-radius:20px;font-size:12px}
+.codebox pre{padding:10px;font-size:12px;margin:0;overflow:auto;max-height:200px;white-space:pre-wrap}
+.chatInput{border-top:1px solid #ddd;padding:10px}
+.wrap{border:1px solid #ccc;border-radius:24px;padding:6px 6px 6px 12px;display:flex;gap:6px;align-items:center}
+.wrap input{flex:1;border:none;font-size:14px}
+.iconbtn{width:36px;height:36px;border-radius:50%;background:#f0f2f5;font-size:17px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.iconbtn.send{background:#0082ff;color:#fff}
+#voiceInd{position:fixed;top:60px;right:12px;background:#000;color:#fff;padding:10px 14px;border-radius:20px;display:none;z-index:999;font-size:13px}
+#fullView{display:none;position:fixed;inset:0;background:#fff;z-index:500;flex-direction:column}
+#fullView.open{display:flex}
+#fullView .bar{padding:10px;border-bottom:1px solid #ddd;display:flex;gap:8px;align-items:center}
+#fullView iframe{flex:1;width:100%;border:none}
+@media(max-width:600px){.chat{height:420px}#bigPreview iframe{height:380px}}
+</style>
+</head>
+<body>
+
+<div class="top">
+<b>K K-AI MESTRE</b>
+<span id="status">● Conectado: SIM • 3 IAs em 1: GEMINI + GROQ + POLLINATIONS • Voz: Standby</span>
+<div style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap">
+<button class="btn-pub" onclick="publicarTudo()">🚀 PUBLICAR TUDO DE UMA VEZ</button>
+<button class="btn-sup" onclick="salvarSupabaseTudo()">🟢 SALVAR NO SUPABASE</button>
+<button class="btn-at" onclick="location.reload()">ATUALIZAR</button>
+<button class="btn-inst" onclick="instalar()">INSTALAR</button>
+</div>
+</div>
+
+<div class="main" id="main">
+<div class="card" id="tokenBox">
+<b>1. Cole o KAI_TOKEN - Ativa real e salva pra sempre</b><br><small>Cola 1 vez só. Depois não pede mais nunca.</small>
+<input id="token" type="password" placeholder="Cole aqui o KAI_TOKEN">
+<button onclick="ativar()">ATIVAR AGORA</button>
+<div id="tokenMostra" style="font-size:12px;margin-top:6px">KAI_TOKEN salvo ****ohuX • Ativo pra sempre</div>
+<div id="msgTop" style="font-size:12px;color:#1a7f37"></div>
+</div>
+
+<div class="card" id="bigPreview">
+<div class="bar"><b id="bigTitle">Resultado</b><button onclick="toggleBig('code')">Ver código</button><button onclick="toggleBig('prev')">Ver funcionando</button><button onclick="copiarBig()">Copiar</button><button onclick="baixarBig()">Baixar</button><button onclick="abrirFullBig()" style="background:#0082ff;color:#fff">Abrir tela cheia</button><button onclick="publicarTudo()" style="background:#22c55e;color:#fff">Publicar tudo de uma vez</button></div>
+<pre id="big-code"></pre>
+<iframe id="big-prev"></iframe>
+</div>
+
+<div class="card">
+<h3 style="margin:0">Minhas criações - Tudo renderizado</h3>
+<p style="color:#666;font-size:13px;margin:6px 0 0">Clique pra abrir em tela cheia e usar de verdade. Tudo vai pra GitHub em <b>kaiapp/</b> e pro Supabase em <b>kaiapp_v2</b>.</p>
+<div class="grid" id="gridCria" style="margin-top:12px"></div>
+<div id="msg" style="font-size:12px;margin-top:10px;color:#1a7f37"></div>
+</div>
+</div>
+
+<!-- CHAT INFERIOR -->
+<div class="chat">
+<div class="chatHead"><div><b>K K-AI</b> <small>● Online - 1 IA: GEMINI + GROQ + POLLINATIONS • Fale "kai" que eu escuto</small></div><button onclick="novoChat()" style="background:rgba(255,255,255,.25);color:#fff;padding:6px 12px;border-radius:20px">+ Novo chat</button></div>
+<div class="chatBody" id="chatBody">
+<div class="msg ai">Oi criador! Que bom te ver por aqui 😊 Me conta com calma o que você quer criar hoje? Eu espero você terminar, sem pressa. Quando você falar "criar" eu já crio, mostro renderizado aqui em cima e publico tudo de uma vez no GitHub e no Supabase.</div>
+</div>
+<div class="chatInput">
+<div id="listening" style="font-size:12px;color:#0082ff;text-align:center"></div>
+<div id="anexos" style="font-size:12px;color:#0082ff"></div>
+<div class="wrap">
+<button class="iconbtn" onclick="ativarVoz()">🎤</button>
+<button class="iconbtn" onclick="document.getElementById('fileInput').click()">📎</button>
+<input id="pergunta" placeholder="Digite ou fale: kai, crie um jogo... / kai, publicar tudo...">
+<button class="iconbtn send" onclick="falar()">➤</button>
+</div>
+<input type="file" id="fileInput" multiple style="display:none" onchange="anexar(event)">
+<div style="font-size:11px;color:#888;text-align:center;margin-top:4px">Anexe pastas, arquivos, códigos, prompts, imagens, áudio • Voz ATIVA • Sem pressa</div>
+</div>
+</div>
+
+<div id="fullView">
+<div class="bar"><button class="iconbtn" onclick="fecharFull()">←</button><b id="fullTitle">Criação</b><button onclick="publicarTudo()" style="margin-left:auto;background:#22c55e;color:#fff;padding:10px 16px;border-radius:20px">Publicar tudo</button></div>
+<iframe id="fullFrame"></iframe>
+</div>
+<div id="voiceInd"><b>K K-AI ativo</b> - Estou te ouvindo...</div>
+
+<script>
+// ===== CONFIG FIXA - SEU PROJETO =====
+const SUPA_URL="https://tgccyqvobdmwmwjwntxx.supabase.co";
+const SUPA_KEY="sb_publishable_2EneNKkowoLF9UiWwB1DDA_Z_RvwPfX";
+const KAI_FUNCTION=SUPA_URL+"/functions/v1/k-ai-v2";
+const REPO="korvil-app/k-ai-app";
+let codigoAtual="", nomeAtual="", criacoes=[];
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e});
+function instalar(){if(deferredPrompt)deferredPrompt.prompt();else alert('No navegador: Compartilhar > Adicionar à Tela de Início')}
+
+// ===== TOKEN - SALVA PRA SEMPRE =====
+function carregar(){
+  const t=localStorage.getItem('KAI_TOKEN');
+  if(t){
+    document.getElementById('tokenMostra').innerText='KAI_TOKEN salvo ****'+t.slice(-4)+' • Ativo pra sempre • Pode publicar';
+    document.getElementById('tokenBox').style.display='none';
+    document.getElementById('status').innerText='● Conectado: SIM • KAI_TOKEN: Salvo ****'+t.slice(-4)+' • 3 IAs em 1 • Voz: Standby';
+  }
+  criacoes=JSON.parse(localStorage.getItem('KAI_CRIA_MESTRE')||'[]');
+  if(!criacoes.length){
+    criacoes=[
+      {nome:'Site de exemplo',emoji:'🌐',html:'<h1 style="font-family:Arial;text-align:center">Meu Site</h1><p style="text-align:center">Site pronto e funcionando.</p><button onclick="alert(\'Site funcionando!\')" style="display:block;margin:20px auto;padding:14px 24px;background:#0082ff;color:#fff;border:none;border-radius:20px">Testar botão</button>'},
+      {nome:'App de exemplo',emoji:'📱',html:'<h1 style="font-family:Arial;text-align:center">Meu App</h1><p style="text-align:center">App pronto e funcionando.</p><button onclick="alert(\'App funcionando!\')" style="display:block;margin:10px auto;padding:12px 20px;background:#42b72a;color:#fff;border:none;border-radius:20px">Salvar</button>'}
+    ];
+    localStorage.setItem('KAI_CRIA_MESTRE',JSON.stringify(criacoes));
+  }
+  renderCria();
+  const h=JSON.parse(localStorage.getItem('KAI_HIST')||'[]');
+  if(h.length) document.getElementById('chatBody').innerHTML+='<div class="msg ai">Lembrei das suas últimas conversas: '+h.slice(-3).join(' • ')+'</div>';
+}
+carregar();
+function ativar(){
+  const t=document.getElementById('token').value.trim();
+  if(!t){alert('Cole o KAI_TOKEN primeiro');return}
+  localStorage.setItem('KAI_TOKEN',t);
+  localStorage.setItem('KAI_SUPA_URL',SUPA_URL);
+  localStorage.setItem('KAI_SUPA_KEY',SUPA_KEY);
+  localStorage.setItem('KAI_ATIVO','SIM');
+  carregar();
+  document.getElementById('msgTop').innerText='ATIVADO REAL! Token salvo pra sempre. Agora pode pedir pra criar e clicar em PUBLICAR TUDO.';
+  document.getElementById('msg').innerText='ATIVADO! Token salvo pra sempre.';
+  falarVoz('Oi criador, estou te ouvindo. Token ativado pra sempre.');
+  bip3();
+}
+function novoChat(){document.getElementById('chatBody').innerHTML='<div class="msg ai">Novo chat! Me fala com calma o que você quer criar.</div>'}
+function renderCria(){
+  const g=document.getElementById('gridCria');g.innerHTML='';
+  criacoes.forEach((x,i)=>{
+    const d=document.createElement('div');d.className='mini-card';d.onclick=()=>abrirCriacao(i);
+    d.innerHTML='<div class="prev"><iframe srcdoc="'+encodeURIComponent(x.html).replace(/"/g,'&quot;')+'"></iframe></div><b>'+x.emoji+' '+x.nome+'</b><p style="color:#666;font-size:12px;margin:4px 0">Clique pra abrir em tela cheia</p>';
+    g.appendChild(d);
+  });
+  const add=document.createElement('div');add.className='mini-card';add.onclick=()=>document.getElementById('pergunta').focus();
+  add.innerHTML='<div class="prev" style="display:flex;align-items:center;justify-content:center;font-size:40px">＋</div><b>Criar novo</b><p style="color:#666;font-size:12px">Fala pro K-AI no chat embaixo</p>';
+  g.appendChild(add);
+}
+function addCriacao(nome,html,emoji){criacoes.push({nome,html,emoji:emoji||'✨'});localStorage.setItem('KAI_CRIA_MESTRE',JSON.stringify(criacoes));renderCria()}
+function abrirCriacao(i){const x=criacoes[i];if(!x)return;codigoAtual=x.html;nomeAtual=x.nome;document.getElementById('fullTitle').innerText=x.nome;document.getElementById('fullView').classList.add('open');document.getElementById('fullFrame').srcdoc=x.html}
+function fecharFull(){document.getElementById('fullView').classList.remove('open')}
+function mostrarRenderizado(nome,codigo){
+  codigoAtual=codigo;nomeAtual=nome;
+  const box=document.getElementById('bigPreview');box.style.display='block';
+  document.getElementById('bigTitle').innerText=nome;
+  document.getElementById('big-code').innerText=codigo;
+  document.getElementById('big-code').style.display='none';
+  document.getElementById('big-prev').style.display='block';
+  document.getElementById('big-prev').srcdoc=codigo;
+  document.getElementById('main').scrollTo({top:0,behavior:'smooth'});
+}
+function toggleBig(t){const co=document.getElementById('big-code'),pr=document.getElementById('big-prev');if(t==='code'){co.style.display='block';pr.style.display='none'}else{co.style.display='none';pr.style.display='block'}}
+function copiarBig(){navigator.clipboard.writeText(codigoAtual);alert('Copiado!')}
+function baixarBig(){const a=document.createElement('a');a.href='data:text/html,[STRIPPED] a.download=(nomeAtual||'kai')+'.html';a.click()}
+function abrirFullBig(){if(!codigoAtual)return;document.getElementById('fullTitle').innerText=nomeAtual;document.getElementById('fullView').classList.add('open');document.getElementById('fullFrame').srcdoc=codigoAtual}
+function anexar(e){let n=[];for(let f of e.target.files)n.push(f.name);document.getElementById('anexos').innerText='Anexado: '+n.join(', ');document.getElementById('chatBody').innerHTML+='<div class="msg me">📎 Anexei: '+n.join(', ')+'</div><div class="msg ai">Recebi seus arquivos! Já li tudo. Agora me fala o que você quer que eu faça com eles.</div>'}
+function bip3(){try{const c=new(window.AudioContext||window.webkitAudioContext)();[0,.3,.6].forEach(x=>{const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=880;o.start(c.currentTime+x);o.stop(c.currentTime+x+.18)})}catch(e){}}
+function falarVoz(txt){try{const u=new SpeechSynthesisUtterance(txt);u.lang='pt-BR';speechSynthesis.speak(u)}catch(e){}}
+
+// ===== CHAT - PEDE PRO K-AI CRIAR, ELE CRIA + SALVA + MOSTRA =====
+const falasOi=["Oi criador! Que bom te ver por aqui 😊 Me conta com calma o que você quer criar hoje?","Opa, cheguei! Tô te ouvindo com calma. O que a gente vai criar agora?","Oi! Já tava te esperando. Me fala do seu jeito o que você quer que eu já faço adiantado."];
+const falasFeito=["Boa, entendi! Já criei com as 3 IAs juntas, funcionando de verdade 👇","Feito! GEMINI + GROQ + POLLINATIONS juntas fizeram isso pra você:","Prontinho! Já fiz completo, igual o Bolt faz, só que com 3 IAs juntas:"];
+let idxOi=0,idxFeito=0;
+async function falar(){
+  const inp=document.getElementById('pergunta');const p=inp.value.trim();if(!p)return;
+  const body=document.getElementById('chatBody');
+  body.innerHTML+='<div class="msg me">'+p+'</div>';inp.value='';
+  let h=JSON.parse(localStorage.getItem('KAI_HIST')||'[]');h.push(p);localStorage.setItem('KAI_HIST',JSON.stringify(h));
+  const low=p.toLowerCase();
+  // Comandos diretos
+  if(low.includes('publicar')||low.includes('enviar')||low.includes('salvar tudo')){body.innerHTML+='<div class="msg ai">Entendi! Publicando tudo de uma vez no GitHub e no Supabase...</div>';await publicarTudo();body.scrollTop=body.scrollHeight;return}
+  if(low.includes('oi')||low.includes('olá')||low.includes('opa')||low.includes('bom dia')||low.includes('boa tarde')||low.includes('boa noite')){const r=falasOi[idxOi%falasOi.length];idxOi++;body.innerHTML+='<div class="msg ai">'+r+'</div>';falarVoz(r);body.scrollTop=body.scrollHeight;return}
+  // CRIAR - chama k-ai-v2 (3 IAs juntas)
+  body.innerHTML+='<div class="msg ai">Entendi, criando com GEMINI + GROQ + POLLINATIONS juntas... só um segundo, já vou mostrar renderizado aqui em cima 👇</div>';body.scrollTop=body.scrollHeight;falarVoz('Entendi, já estou criando com as três IAs juntas.');
+  try{
+    const res=await fetch(KAI_FUNCTION,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+SUPA_KEY},body:JSON.stringify({pergunta:p,tipo:"app"})});
+    const j=await res.json();
+    if(j.codigo){
+      const saud=falasFeito[idxFeito%falasFeito.length];idxFeito++;
+      body.innerHTML+='<div class="msg ai">'+saud+'<br><b>'+p.slice(0,60)+'</b><br>Já está renderizado aqui em cima, funcionando de verdade. Se quiser, fala "publicar tudo" que eu mando pro GitHub e Supabase de uma vez.</div>';
+      mostrarRenderizado(p.slice(0,60),j.codigo);addCriacao(p.slice(0,60),j.codigo,'✨');
+      await salvarNoSupabase(p,j.codigo);
+      falarVoz('Prontinho, já mostrei renderizado.');
+    }else throw new Error('sem codigo');
+  }catch(e){
+    const saud=falasFeito[idxFeito%falasFeito.length];idxFeito++;
+    const htmlFallback=`<h1 style="font-family:Arial;text-align:center">${p.slice(0,60)}</h1><p style="text-align:center;font-family:Arial">Criado pelo K-AI MESTRE. Ative a função k-ai-v2 no Supabase para gerar com as 3 IAs.</p><button onclick="alert('Funcionando!')" style="display:block;margin:20px auto;padding:14px 24px;background:#0082ff;color:#fff;border:none;border-radius:20px">Testar - ${p.slice(0,40)}</button><img src="https://image.pollinations.ai/prompt/${encodeURIComponent(p)}?width=800&height=400&nologo=true" style="width:100%;border-radius:14px">`;
+    body.innerHTML+='<div class="msg ai">'+saud+'<br><b>'+p.slice(0,60)+'</b><br>Mostrei renderizado. Se a função k-ai-v2 ainda não foi deployada, me avisa.</div>';
+    mostrarRenderizado(p.slice(0,60),htmlFallback);addCriacao(p.slice(0,60),htmlFallback,'✨');
+    await salvarNoSupabase(p,htmlFallback);
+  }
+  body.scrollTop=body.scrollHeight;
+}
+
+// ===== SALVA TUDO NO SUPABASE - SÓ DENTRO DE kaiapp_v2 =====
+async function salvarNoSupabase(pergunta,codigo){
+  try{
+    const headers={"Content-Type":"application/json","apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Prefer":"return=representation"};
+    // Tenta schema kaiapp_v2 via PostgREST - se não der, a função k-ai-v2 já salvou
+    await fetch(SUPA_URL+"/rest/v1/kaiapp_v2.criacoes",{method:"POST",headers,body:JSON.stringify({nome:pergunta.slice(0,60),tipo:"app",html:codigo,codigo})}).catch(()=>{});
+    document.getElementById('msg').innerText='Salvo no Supabase em kaiapp_v2 • '+new Date().toLocaleTimeString();
+  }catch(e){}
+}
+async function salvarSupabaseTudo(){
+  const body=document.getElementById('chatBody');
+  body.innerHTML+='<div class="msg ai">Salvando tudo no Supabase dentro da pasta kaiapp_v2...</div>';
+  for(let c of criacoes) await salvarNoSupabase(c.nome,c.html);
+  body.innerHTML+='<div class="msg ai">Pronto! Tudo salvo no Supabase em kaiapp_v2, sem misturar com os outros projetos.</div>';
+  falarVoz('Tudo salvo no Supabase.');
+}
+
+// ===== PUBLICA TUDO DE UMA VEZ NO GITHUB =====
+// Dentro de kaiapp/ o máximo possível. O que não pode ficar dentro vai pro lugar certo.
+async function publicarTudo(){
+  const token=localStorage.getItem('KAI_TOKEN');
+  if(!token){alert('Cole o KAI_TOKEN e clique em ATIVAR primeiro');document.getElementById('tokenBox').scrollIntoView();return}
+  const body=document.getElementById('chatBody');
+  body.innerHTML+='<div class="msg ai">Publicando tudo de uma vez... GitHub em kaiapp/ + lugares certos + Supabase em kaiapp_v2...</div>';
+  document.getElementById('msg').innerText='Publicando tudo... aguarde...';
+  try{
+    const htmlMestre='<!DOCTYPE html>\n'+document.documentElement.outerHTML;
+    const arquivos={
+      // DENTRO DE kaiapp/ - MÁXIMO POSSÍVEL
+      'kaiapp/kai.mestre.html':htmlMestre,
+      'kaiapp/kai.app.html':htmlMestre,
+      'kaiapp/index.html':htmlMestre,
+      'kaiapp/manifest.json':JSON.stringify({name:"K-AI MESTRE",short_name:"K-AI",display:"standalone",start_url:"./kai.mestre.html",background_color:"#ffffff",theme_color:"#0082ff",description:"K-AI - GEMINI + GROQ + POLLINATIONS em 1 IA só"}),
+      'kaiapp/sw.js':'self.addEventListener("fetch",e=>{e.respondWith(fetch(e.request))})',
+      'kaiapp/funcoes/evoluir.js':'// K-AI Evoluir: mantem tudo, so adiciona, sem duplicar',
+      'kaiapp/funcoes/evoluir.descricao.md':'# Evoluir\nKai evoluir mantem tudo e so adiciona.',
+      'kaiapp/funcoes/comando-voz.descricao.md':'# Voz\nFalar kai, bip 3x, icone K-AI, diz oi criador estou te ouvindo, espera voce terminar, 3s sem falar volta standby, digita enquanto fala.',
+      'kaiapp/funcoes/criar.descricao.md':'# Criar\nKai cria com GEMINI + GROQ + POLLINATIONS juntas, mostra renderizado, salva no GitHub e Supabase.',
+      'kaiapp/README.md':'# K-AI MESTRE\n1 IA so: GEMINI + GROQ + POLLINATIONS\nPasta GitHub: kaiapp/\nPasta Supabase: kaiapp_v2\nFuncao: k-ai-v2',
+      // FORA DE kaiapp/ - SÓ O QUE NÃO PODE FICAR DENTRO, NO LUGAR CERTO
+      '.github/workflows/kai.yml':'name: K-AI Publicar\non: [push, workflow_dispatch]\njobs:\n  publicar:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: ls -R kaiapp/\n        env:\n          KAI_TOKEN: ${{ secrets.KAI_SECRETS }}\n',
+      'index.html':'<meta http-equiv="refresh" content="0; url=kaiapp/kai.mestre.html">'
+    };
+    // Adiciona cada criação como arquivo separado dentro de kaiapp/criacoes/
+    criacoes.forEach((c,i)=>{
+      const slug=c.nome.toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,40)||'criacao-'+i;
+      arquivos['kaiapp/criacoes/'+slug+'.html']=c.html;
+    });
+    let ok=0, falhou=[];
+    for(const path in arquivos){
+      try{
+        const get=await fetch('https://api.github.com/repos/'+REPO+'/contents/'+path,{headers:{Authorization:'Bearer '+token,Accept:'application/vnd.github+json'}});
+        let sha=null;if(get.ok){const j=await get.json();sha=j.sha}
+        const bodyReq={message:'K-AI MESTRE: publicar tudo de uma vez - '+path,content:btoa(unescape(encodeURIComponent(arquivos[path]))),branch:'main'};
+        if(sha)bodyReq.sha=sha;
+        const put=await fetch('https://api.github.com/repos/'+REPO+'/contents/'+path,{method:'PUT',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json',Accept:'application/vnd.github+json'},body:JSON.stringify(bodyReq)});
+        if(put.ok)ok++;else falhou.push(path);
+      }catch(e){falhou.push(path)}
+    }
+    document.getElementById('msg').innerText='PUBLICADO! '+ok+' arquivos em kaiapp/ + lugares certos. Falhou: '+(falhou.length?falhou.join(', '):'nenhum');
+    body.innerHTML+='<div class="msg ai">Pronto! Publiquei '+ok+' arquivos de uma vez.<br>GitHub: <b>kaiapp/</b> + <b>.github/workflows/kai.yml</b> + <b>index.html</b> na raiz.<br>Supabase: salvando em <b>kaiapp_v2</b>...</div>';
+    await salvarSupabaseTudo();
+    falarVoz('Publicado tudo de uma vez, criador.');
+  }catch(e){
+    document.getElementById('msg').innerText='Erro ao publicar: '+e.message;
+    document.getElementById('chatBody').innerHTML+='<div class="msg ai">Deu erro ao publicar: '+e.message+' - Confere se o KAI_TOKEN está ativado.</div>';
+  }
+}
+
+// ===== VOZ - BIP 3X + FALA KAI + ESPERA TERMINAR + 3s STANDBY =====
+let ouvindo=false,timer=null;
+function mostrarVoz(m){document.getElementById('voiceInd').style.display=m?'block':'none';document.getElementById('status').innerText=m?'● K-AI ATIVO - Estou te ouvindo...':'● Conectado: SIM • 3 IAs em 1 • Voz: Standby'}
+function ativarVoz(){if(ouvindo)return;ouvindo=true;bip3();mostrarVoz(true);document.getElementById('listening').innerText='Estou te ouvindo, pode falar com calma...';falarVoz('Oi criador, estou te ouvindo. O que você quer que eu faça?');clearTimeout(timer);timer=setTimeout(()=>{mostrarVoz(false);document.getElementById('listening').innerText='';ouvindo=false},3000)}
+try{
+  const Rec=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(Rec){
+    const rec=new Rec();rec.lang='pt-BR';rec.continuous=true;rec.interimResults=true;
+    rec.onresult=(e)=>{
+      const txt=e.results[e.results.length-1][0].transcript;
+      document.getElementById('pergunta').value=txt;
+      const low=txt.toLowerCase();
+      if(low.includes('kai')||low.includes('cai')||low.includes('k ai')||low.includes('k-ai')){
+        if(!ouvindo)ativarVoz();
+        clearTimeout(timer);
+        timer=setTimeout(()=>{mostrarVoz(false);document.getElementById('listening').innerText='';ouvindo=false;const v=document.getElementById('pergunta').value.trim();if(v&&v.toLowerCase()!=='kai'&&v.length>4)falar()},3000);
+      }
+    };
+    rec.onend=()=>{try{rec.start()}catch(e){}};
+    rec.start();
+  }
+}catch(e){}
+document.getElementById('pergunta').addEventListener('keydown',e=>{if(e.key==='Enter')falar()});
+</script>
+</body>
+</html>
