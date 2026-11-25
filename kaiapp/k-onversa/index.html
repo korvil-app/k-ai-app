@@ -1,36 +1,173 @@
 <!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K-AI | Saudação</title>
-    <style>
-        body {
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background: #0f172a;
-            font-family: 'Segoe UI', sans-serif;
-            color: #f8fafc;
-        }
-        .container {
-            text-align: center;
-            padding: 2rem;
-            border: 1px solid #334155;
-            border-radius: 1rem;
-            background: #1e293b;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-        }
-        h1 { margin: 0; font-size: 3rem; color: #38bdf8; }
-        p { color: #94a3b8; margin-top: 0.5rem; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Oi!</h1>
-        <p>Conectado via K-AI: Gemini + Groq + Pollinations.</p>
-    </div>
-</body>
-</html>
+<html lang="pt-BR"><head><style>
+@font-face {
+  font-family: "Optimistic";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("/fonts/OptimisticAI_VF_Optimized.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Optimistic Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/OptimisticMono_W_TextRegular.woff2") format("woff2");
+}
+:where(html) {
+  font-family: "Optimistic", system-ui, sans-serif;
+}
+:where(code, pre, kbd, samp) {
+  font-family: "Optimistic Mono", ui-monospace, monospace;
+}
+</style><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>K-ONVERSA</title><style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,Helvetica,sans-serif}body{background:#0b141a;color:#e9edef;height:100dvh;overflow:hidden}
+#app{max-width:480px;margin:0 auto;height:100dvh;background:#111b21;position:relative;display:flex;flex-direction:column}
+header{padding:10px 14px;display:flex;justify-content:space-between;align-items:center;background:#202c33}header h1{font-size:21px}header .icons{font-size:20px;display:flex;gap:16px;cursor:pointer}
+.search{margin:8px 12px;background:#202c33;border-radius:8px;padding:9px 12px;color:#8696a0;display:flex;gap:8px}.search input{background:transparent;border:0;outline:0;color:#fff;width:100%}
+.list{flex:1;overflow:auto;padding-bottom:90px}.chat{display:flex;gap:12px;padding:11px 14px;cursor:grab;border-bottom:1px solid #222d34}.chat:active{cursor:grabbing;background:#202c33}
+.avatar{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;flex-shrink:0;color:#fff}
+.meta{flex:1;min-width:0}.meta .top{display:flex;justify-content:space-between}.meta .name{font-size:16px}.meta .time{font-size:12px;color:#8696a0}.meta .msg{font-size:13px;color:#8696a0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.badge{background:#00a884;color:#111b21;border-radius:50%;min-width:20px;height:20px;font-size:12px;display:flex;align-items:center;justify-content:center;padding:0 5px;margin-left:6px}
+.fab{position:absolute;right:16px;bottom:88px;width:56px;height:56px;border-radius:50%;background:#00a884;border:0;color:#111b21;font-size:30px;cursor:pointer;z-index:20}
+.fab.kai{bottom:152px;width:52px;height:52px;background:#7c4dff;color:#fff;font-size:11px;font-weight:800;line-height:1.1}
+nav{position:absolute;left:0;right:0;bottom:0;display:flex;background:#202c33;border-top:1px solid #333}nav button{flex:1;background:transparent;border:0;color:#8696a0;padding:10px 0;cursor:pointer;font-size:12px}nav button.on{color:#fff}nav button b{display:block;font-size:20px}
+.screen{display:none;flex-direction:column;height:100%} .screen.on{display:flex}
+.chatHead{background:#202c33;padding:8px;display:flex;align-items:center;gap:10px}.chatHead button{background:transparent;border:0;color:#fff;font-size:20px;cursor:pointer}.chatHead .who{flex:1}.chatHead .who small{display:block;color:#8696a0;font-size:12px}
+.msgs{flex:1;overflow:auto;padding:12px;background:#0b141a;display:flex;flex-direction:column;gap:8px}.b{max-width:82%;padding:8px 10px;border-radius:10px;font-size:14px;line-height:1.4;white-space:pre-wrap;word-break:break-word}.b.me{align-self:flex-end;background:#005c4b}.b.them{align-self:flex-start;background:#202c33}.b small{display:block;font-size:11px;color:#aebac1;text-align:right}
+.card{background:#182229;border:1px solid #2a3942;border-radius:12px;padding:10px;margin-top:6px}.card iframe{width:100%;height:280px;border:0;background:#fff;border-radius:8px}.card button{background:#00a884;border:0;border-radius:20px;padding:7px 12px;margin:4px 4px 0 0;cursor:pointer;font-weight:700}
+.inputBar{display:flex;gap:6px;padding:8px;background:#202c33;align-items:center}.inputBar input{flex:1;border:0;outline:0;border-radius:24px;padding:11px 14px;background:#2a3942;color:#fff}.inputBar button{border:0;background:#00a884;color:#111b21;width:42px;height:42px;border-radius:50%;font-size:18px;cursor:pointer}
+.think{color:#8696a0;font-size:12px;padding:4px 12px}
+.statusRow{display:flex;gap:12px;padding:12px;align-items:center;cursor:pointer;border-bottom:1px solid #222d34}.statusRow .avatar{border:3px solid #00a884}
+.viewer{position:absolute;inset:0;background:#000;z-index:50;display:none;flex-direction:column}.viewer.on{display:flex}.viewer .top{padding:10px;display:flex;gap:10px;align-items:center}.viewer .center{flex:1;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px}.viewer .bottom{display:flex;justify-content:space-between;padding:14px;align-items:center}
+.seen{position:absolute;left:0;right:0;bottom:0;background:#111b21;z-index:60;border-radius:18px 18px 0 0;display:none;max-height:70%;overflow:auto;padding:14px}.seen.on{display:block}
+input.path{width:100%;padding:9px;border-radius:8px;border:0;background:#2a3942;color:#fff;margin-top:6px}
+</style></head><body><div id="app">
+
+<!-- LISTA -->
+<div class="screen on" id="s-lista">
+<header><h1>K-ONVERSA</h1><div class="icons"><span onclick="alert('Câmera')">📷</span><span onclick="alert('Pesquisa')">🔍</span><span>⋮</span></div></header>
+<div class="search">🔍 <input id="q" placeholder="Pesquisar ou começar uma nova conversa" oninput="filtrar()"></div>
+<div class="list" id="lista"></div>
+<button class="fab kai" onclick="abrirChat('kai')">🤖<br>K-AI</button>
+<button class="fab" onclick="novaConversa()">+</button>
+<nav><button onclick="aba('lista')" class="on"><b>💬</b>Conversas</button><button onclick="alert('Comunidades')"><b>👥</b>Comunidades</button><button onclick="aba('atualizacoes')"><b>🔄</b>Atualizações</button><button onclick="alert('Ligações')"><b>📞</b>Ligações</button></nav>
+</div>
+
+<!-- ATUALIZACOES -->
+<div class="screen" id="s-atualizacoes">
+<header><h1>Atualizações</h1><div class="icons"><span>🔍</span><span>⋮</span></div></header>
+<div style="padding:12px"><b>Status</b><span style="float:right">🔒</span></div>
+<div class="statusRow" onclick="abrirMeuStatus()"><div class="avatar" style="background:#7c4dff">EU</div><div class="meta"><div class="name">Meu status</div><div class="msg">Ontem</div></div></div>
+<div style="padding:12px 12px 4px;color:#8696a0">Atualizações recentes</div>
+<div id="statusLista"></div>
+<nav><button onclick="aba('lista')"><b>💬</b>Conversas</button><button><b>👥</b>Comunidades</button><button class="on"><b>🔄</b>Atualizações</button><button><b>📞</b>Ligações</button></nav>
+</div>
+
+<!-- MEU STATUS -->
+<div class="screen" id="s-meustatus">
+<header><button onclick="aba('atualizacoes')">←</button><h1 style="flex:1">Meu status</h1><span>↗ ⋮</span></header>
+<div class="statusRow" onclick="abrirViewer()"><div class="avatar" style="background:#7c4dff">EU</div><div class="meta"><div class="name">7 visualizações</div><div class="msg">Ontem 10:06</div></div><span>↗ Meus contatos, exce... ⋮</span></div>
+<div style="padding:24px;text-align:center;color:#8696a0">Suas atualizações de status são <b style="color:#00a884">protegidas com a criptografia de ponta a ponta</b>. Elas desaparecerão após 24 horas.</div>
+<button class="fab kai" onclick="alert('Editar status')">✏️</button><button class="fab" onclick="alert('Câmera')">📷</button>
+</div>
+
+<!-- CHAT -->
+<div class="screen" id="s-chat">
+<div class="chatHead"><button onclick="voltar()">←</button><div class="avatar" id="c-av" style="width:38px;height:38px">K</div><div class="who"><b id="c-nome">K-AI</b><small id="c-sub">online</small></div><span>🕘 🔕 ⋮</span></div>
+<div class="msgs" id="msgs"></div><div class="think" id="think"></div>
+<div style="padding:6px 12px;display:none" id="pubBox"><input class="path" id="caminho" value="kaiapp/k-onversa/index.html"><button style="background:#00a884;border:0;border-radius:20px;padding:8px 14px;margin-top:6px;font-weight:700" onclick="publicar()">Publicar no GitHub</button><div id="pubMsg" style="font-size:12px;margin-top:6px"></div></div>
+<div class="inputBar"><button onclick="emoji()">😊</button><button onclick="anexo()">📎</button><input id="texto" placeholder="Mensagem" onkeydown="if(event.key==='Enter')enviar()"><button onclick="enviar()">➤</button></div>
+</div>
+
+<!-- VIEWER STATUS -->
+<div class="viewer" id="viewer">
+<div style="height:4px;background:#333;margin:8px"><div style="width:70%;height:100%;background:#fff"></div></div>
+<div class="top"><button style="background:none;border:0;color:#fff;font-size:20px" onclick="fecharViewer()">←</button><div class="avatar" style="width:36px;height:36px;background:#7c4dff">EU</div><div style="flex:1"><b>Meu status</b><br><small>Ontem 10:06 • Stories</small></div><span>⋮</span></div>
+<div class="center"><div><div style="font-size:60px">▶️</div><h2>TikTok • K-TP Treinamento Personalizado</h2><p>Vê agora o vídeo todo!<br>vt.tiktok.com</p></div></div>
+<div class="bottom"><button style="background:none;border:0;color:#fff;font-size:18px" onclick="abrirQuemViu()">👁 7</button><span>↗ 📤</span></div>
+<div class="seen" id="seen"><b>Visto por 7</b><span style="float:right">⋮</span><p style="color:#8696a0;font-size:13px;margin:6px 0">Status compartilhado no Facebook e Instagram.</p><div id="quemViu"></div><button onclick="fecharQuemViu()" style="width:100%;padding:10px;margin-top:10px;border:0;border-radius:20px">Fechar</button></div>
+</div>
+</div>
+
+<script>
+const API="https://tgccyqvobdmwmwjwntxx.supabase.co/functions/v1/k-ai-v2";
+let ordem=[
+ {id:'meta',nome:'META AI',msg:'Como posso ajudar?',hora:'09:12',cor:'#0082fb',ini:'M'},
+ {id:'gemini',nome:'GEMINI',msg:'Pronto para criar.',hora:'09:10',cor:'#1ba94c',ini:'G'},
+ {id:'groq',nome:'GROQ',msg:'Corrigido e melhorado.',hora:'09:08',cor:'#f48120',ini:'G'},
+ {id:'polli',nome:'POLLINATIONS',msg:'Imagem gerada.',hora:'09:05',cor:'#e91e63',ini:'P'},
+ {id:'gpt',nome:'CHAT GPT',msg:'Olá!',hora:'Ontem',cor:'#10a37f',ini:'C'},
+ {id:'bolt',nome:'BOLT',msg:'Projeto atualizado.',hora:'Ontem',cor:'#000',ini:'B'},
+ {id:'github',nome:'GITHUB',msg:'Commit feito.',hora:'Ontem',cor:'#24292f',ini:'G'},
+ {id:'supabase',nome:'SUPABASE',msg:'Banco salvo.',hora:'Ontem',cor:'#3ecf8e',ini:'S'},
+ {id:'kai',nome:'K-AI',msg:'GEMINI + GROQ + POLLINATIONS',hora:'Agora',cor:'#7c4dff',ini:'K'},
+];
+let atual='kai';
+let historico={kai:[{me:false,txt:'Olá, criador! Sou o K-AI: Gemini cria, Groq melhora e corrige, Pollinations gera imagem. O que vamos criar?'}]};
+let status=[
+ {n:'Maria Adelaide Maria Adelaide',h:'há 19 minutos',c:'#e91e63',i:'M'},
+ {n:'Suely',h:'06:42',c:'#ff9800',i:'S'},{n:'Daniele Vieira Leite',h:'Ontem',c:'#009688',i:'D'},
+ {n:'City Cell Mello Tetch',h:'Ontem',c:'#3f51b5',i:'C'},{n:'Fran!!',h:'Ontem',c:'#9c27b0',i:'F'},
+ {n:'Adelia🦋🫶',h:'Ontem',c:'#f44336',i:'A'},{n:'Tayna Triscilla',h:'Ontem',c:'#00bcd4',i:'T'},{n:'guim saoc',h:'Ontem',c:'#795548',i:'g'}
+];
+let quem=[['Don','Ontem 19:03'],['Amor ❤️','Ontem 18:26'],['Luiz Fonseca','Ontem 13:03'],['Suely','Ontem 12:56'],['maria cristina franxisco','Ontem 11:46'],['Hellem Vitoria','Ontem 10:24'],['kathylin rocha','Ontem 10:18']];
+function salvar(){try{localStorage.setItem('k-onversa',JSON.stringify({ordem,historico}))}catch(e){}}
+function carregar(){try{const d=JSON.parse(localStorage.getItem('k-onversa')||'null');if(d){ordem=d.ordem||ordem;historico=d.historico||historico}}catch(e){}}
+function renderLista(){
+ document.getElementById('lista').innerHTML=ordem.map((c,i)=>`<div class="chat" draggable="true" data-i="${i}" onclick="abrirChat('${c.id}')"><div class="avatar" style="background:${c.cor}">${c.ini}</div><div class="meta"><div class="top"><span class="name">${c.nome}</span><span class="time">${c.hora}</span></div><div class="msg">${c.msg}</div></div></div>`).join('');
+ document.querySelectorAll('.chat').forEach(el=>{el.ondragstart=e=>e.dataTransfer.setData('text',el.dataset.i);el.ondragover=e=>e.preventDefault();el.ondrop=e=>{let a=+e.dataTransfer.getData('text'),b=+el.dataset.i;let it=ordem.splice(a,1)[0];ordem.splice(b,0,it);salvar();renderLista();}});
+ document.getElementById('statusLista').innerHTML=status.map(s=>`<div class="statusRow" onclick="abrirViewer()"><div class="avatar" style="background:${s.c}">${s.i}</div><div class="meta"><div class="name">${s.n}</div><div class="msg">${s.h}</div></div></div>`).join('');
+ document.getElementById('quemViu').innerHTML=quem.map(q=>`<div class="statusRow"><div class="avatar" style="background:#607d8b">${q[0][0]}</div><div class="meta"><div class="name">${q[0]}</div><div class="msg">${q[1]}</div></div><span>💬</span></div>`).join('');
+}
+function filtrar(){let q=document.getElementById('q').value.toLowerCase();document.querySelectorAll('#lista .chat').forEach(el=>{el.style.display=el.innerText.toLowerCase().includes(q)?'flex':'none'})}
+function aba(n){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));document.getElementById(n==='lista'?'s-lista':'s-atualizacoes').classList.add('on');}
+function abrirMeuStatus(){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));document.getElementById('s-meustatus').classList.add('on')}
+function abrirViewer(){document.getElementById('viewer').classList.add('on')}
+function fecharViewer(){document.getElementById('viewer').classList.remove('on')}
+function abrirQuemViu(){document.getElementById('seen').classList.add('on')}
+function fecharQuemViu(){document.getElementById('seen').classList.remove('on')}
+function abrirChat(id){
+ atual=id;let c=ordem.find(x=>x.id===id)||ordem[0];
+ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));document.getElementById('s-chat').classList.add('on');
+ document.getElementById('c-nome').innerText=c.nome;document.getElementById('c-av').innerText=c.ini;document.getElementById('c-av').style.background=c.cor;
+ document.getElementById('c-sub').innerText=id==='kai'?'GEMINI + GROQ + POLLINATIONS • Modelos automáticos':'online';
+ document.getElementById('pubBox').style.display=id==='kai'?'block':'none';
+ renderMsgs();
+}
+function voltar(){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));document.getElementById('s-lista').classList.add('on')}
+function renderMsgs(){
+ let h=historico[atual]||[];document.getElementById('msgs').innerHTML=h.map(m=>`<div class="b ${m.me?'me':'them'}">${m.html||''}${m.txt?m.txt.replace(/</g,'&lt;'):''}${m.codigo?`<div class="card"><iframe srcdoc="${m.codigo.replace(/"/g,'&quot;')}"></iframe><br><button onclick="verCodigo(this)">Ver Código</button><button onclick="copiarCodigo(this)">Copiar</button><button onclick="publicarCodigo(this)">Publicar</button><div class="cod" style="display:none;white-space:pre-wrap;font-size:11px;max-height:200px;overflow:auto"></div></div>`:''}<small>${m.hora||''}</small></div>`).join('');
+ let el=document.getElementById('msgs');el.scrollTop=el.scrollHeight;
+ document.querySelectorAll('.cod').forEach((d,i)=>{let m=(historico[atual]||[]).filter(x=>x.codigo)[i];if(m)d.innerText=m.codigo});
+}
+function push(me,txt,extra){historico[atual]=historico[atual]||[];historico[atual].push({me,txt, hora:new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}), ...(extra||{})});salvar();renderMsgs();}
+function emoji(){document.getElementById('texto').value+='😊'}
+function anexo(){alert('Anexo: Documento, Câmera, Galeria, Áudio, Localização, Contato')}
+function novaConversa(){let n=prompt('Nome da conversa?');if(n){ordem.unshift({id:'c'+Date.now(),nome:n,msg:'Nova conversa',hora:'Agora',cor:'#607d8b',ini:n[0].toUpperCase()});salvar();renderLista();}}
+async function enviar(){
+ let inp=document.getElementById('texto');let txt=inp.value.trim();if(!txt)return;inp.value='';
+ push(true,txt);
+ if(atual!=='kai'){setTimeout(()=>push(false,'Recebido, criador! ✅'),600);return;}
+ let th=document.getElementById('think');th.innerText='K-AI pensando... GEMINI + GROQ + POLLINATIONS';
+ try{
+  const ctrl=new AbortController();const to=setTimeout(()=>ctrl.abort(),60000);
+  const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pergunta:txt,tipo:(/cri|app|site|c[oó]digo|html|p[aá]gina|jogo|loja/i.test(txt)?'app':'conversa')}),signal:ctrl.signal});clearTimeout(to);
+  const j=await r.json().catch(()=>({}));
+  th.innerText='';
+  if(j.ok&&j.codigo){push(false,'Pronto - GEMINI + GROQ + POLLINATIONS\n'+(j.modelo_usado||''),{codigo:j.codigo,html:j.imagem?`<img src="${j.imagem}" style="width:100%;border-radius:10px;margin-bottom:6px">`:''});}
+  else{push(false,'K-AI sem conexão com a função k-ai-v2. Erro: '+(j.erro||('HTTP '+r.status)));}
+ }catch(e){th.innerText='';push(false,'K-AI sem conexão com a função k-ai-v2. Erro: '+String(e));}
+}
+function verCodigo(b){let d=b.parentElement.querySelector('.cod');d.style.display=d.style.display==='none'?'block':'none'}
+function copiarCodigo(b){let m=(historico[atual]||[]).filter(x=>x.codigo).pop();if(m)navigator.clipboard.writeText(m.codigo).then(()=>alert('Código copiado!'))}
+async function publicarCodigo(b){
+ let codigo=(historico[atual]||[]).filter(x=>x.codigo).pop()?.codigo;if(!codigo)return alert('Sem código');
+ let caminho=document.getElementById('caminho').value||'kaiapp/k-onversa/index.html';
+ document.getElementById('pubMsg').innerText='Publicando...';
+ try{let r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({acao:'publicar',caminho,codigo})});let j=await r.json();document.getElementById('pubMsg').innerText=j.ok?('Publicado! '+j.url):('Erro: '+(j.erro||''));}
+ catch(e){document.getElementById('pubMsg').innerText='Erro: '+String(e);}
+}
+function publicar(){publicarCodigo()}
+carregar();renderLista();
+</script><script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script></body></html>
