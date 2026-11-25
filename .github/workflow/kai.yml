@@ -1,0 +1,20 @@
+name: K-AI Publicar
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['kaiapp/**']
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Confirmar pasta kaiapp
+        run: |
+          ls -R kaiapp/
+          echo "K-AI OK - usando KAI_SECRETS"
+        env:
+          KAI_TOKEN: ${{ secrets.KAI_SECRETS }}
+          GEMINI_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GROQ_KEY: ${{ secrets.GROQ_API_KEY }}
