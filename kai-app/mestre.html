@@ -3,216 +3,161 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>K-AI MESTRE</title>
+<title>K-AI MESTRE - CORRIGIDO</title>
 <style>
 *{box-sizing:border-box} body{margin:0;font-family:Arial;background:#0b0f14;color:#fff;display:flex;flex-direction:column;height:100vh}
-header{padding:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:#111827;border-bottom:1px solid #222}
-input{padding:9px;border-radius:8px;border:1px solid #333;background:#000;color:#fff;flex:1;min-width:180px}
-button{padding:9px 14px;border:0;border-radius:8px;background:#22c55e;color:#000;font-weight:700;cursor:pointer}
-button.ghost{background:#1f2937;color:#fff} #btnPub{background:#facc15;margin-left:auto}
+header{padding:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:#111827}
+input{padding:10px;border-radius:8px;border:1px solid #333;background:#000;color:#fff;flex:1;min-width:180px}
+button{padding:10px 14px;border:0;border-radius:8px;background:#22c55e;color:#000;font-weight:700;cursor:pointer}
+button.ghost{background:#1f2937;color:#fff} #btnPub{background:#facc15}
 main{flex:1;display:flex;overflow:hidden} #repo{width:42%;overflow:auto;padding:12px;border-right:1px solid #222} #view{flex:1;overflow:auto;padding:12px}
-.item{padding:8px;border-radius:8px;cursor:pointer;border:1px solid transparent} .item:hover{background:#1f2937} .folder{color:#facc15} .file{color:#93c5fd}
-pre{white-space:pre-wrap;background:#000;padding:12px;border-radius:10px;overflow:auto}
-#chatBar{border-top:1px solid #222;padding:10px;background:#111827} #msgs{max-height:180px;overflow:auto;margin-bottom:8px} .msg{padding:8px;background:#1f2937;border-radius:10px;margin:4px 0} .row{display:flex;gap:8px} #prompt{flex:1}
-#status{font-size:12px;color:#a7f3d0}
+.item{padding:9px;border-radius:8px;cursor:pointer} .item:hover{background:#1f2937}
+pre{white-space:pre-wrap;background:#000;padding:12px;border-radius:10px;word-break:break-word}
+#chatBar{border-top:1px solid #222;padding:10px;background:#111827} #msgs{max-height:160px;overflow:auto;margin-bottom:8px} .msg{padding:8px;background:#1f2937;border-radius:10px;margin:4px 0;word-break:break-word} .row{display:flex;gap:8px} #prompt{flex:1}
+.ok{color:#4ade80} .erro{color:#f87171}
 </style>
 </head>
 <body>
 <header>
 <b>K-AI 🤖</b>
-<input id="kaiToken" type="password" placeholder="KAI_TOKEN (GitHub PAT com repo)">
-<input id="groqKey" type="password" placeholder="GROQ_API_KEY">
-<button onclick="ativar()">Ativar e Salvar Pra Sempre</button>
+<input id="kaiToken" type="password" placeholder="KAI_TOKEN - começa com ghp_">
+<input id="groqKey" type="password" placeholder="GROQ_API_KEY - começa com gsk_">
+<button onclick="ativar()">Ativar e Salvar</button>
 <button id="btnPub" onclick="publicarTudo()">🚀 PUBLICAR</button>
+<button class="ghost" onclick="abrirApp()">🌐 Abrir App Publicado</button>
 </header>
-<div style="padding:8px 12px"><span id="status">Coloque os tokens e clique Ativar.</span> | Pasta atual: <b id="pastaAtual">kai-app/</b> <button class="ghost" onclick="voltar()">⬅ Voltar</button> <button class="ghost" onclick="carregarRepo()">🔄 Atualizar Repo</button></div>
+<div style="padding:8px 12px;font-size:13px">
+<span id="status">Carregando...</span> | Pasta: <b id="pastaAtual">kai-app/</b>
+<button class="ghost" onclick="voltar()">⬅ Voltar</button>
+<button class="ghost" onclick="carregarRepo()">🔄 Atualizar</button>
+<br>Destino final: <b>https://korvil-app.github.io/k-ai-app/kai-app</b>
+</div>
 <main>
-<div id="repo"><b>📁 Repositório - clique pra abrir</b><div id="lista"></div></div>
-<div id="view"><b>👁️ Prévia / Arquivo aberto</b><pre id="preview">Clique num arquivo pra ver. Clique numa pasta pra entrar nela.</pre></div>
+<div id="repo"><b>📁 Repositório</b><div id="lista"></div></div>
+<div id="view"><b>👁️ Prévia</b><pre id="preview">Clique num arquivo pra ver.</pre></div>
 </main>
-<div id="chatBar">
-<div id="msgs"></div>
-<div class="row"><input id="prompt" placeholder="Ex: cria aqui dentro loja.html de roupas / cria kai-app/loja.html / cola link do GitHub..."><button onclick="enviar()">Enviar</button></div>
-<div style="font-size:12px;opacity:.7">GROQ + Pollinations combinadas como 1 IA. Tudo criado vai pra kai-app/ se você não falar outro caminho. Sem caminho fixo - usa ./ e detecta repo pela URL.</div>
+<div id="chatBar"><div id="msgs"></div>
+<div class="row"><input id="prompt" placeholder="Ex: cria loja.html de roupas"><button onclick="enviar()">Enviar</button></div>
+<div style="font-size:12px;opacity:.7">Tudo vai pra kai-app/ . Não cole link do GitHub na caixa do token.</div>
 </div>
 <script>
-// ===== CONFIG MÓVEL - NADA FIXO =====
-// Detecta dono/repo/branch pela URL atual, se copiar pra outro repo funciona sozinho
-function detectarRepo(){
-  try{
-    const p = location.pathname.split('/').filter(Boolean);
-    // GitHub Pages: /repo/... ou /user/repo/... | Local: tenta default
-    let owner='korvil-app', repo='k-ai-app';
-    if(location.hostname.includes('github.io')){ owner=location.hostname.split('.')[0]; repo=p[0]||repo; }
-    if(p.length>=2 && location.hostname.includes('github.com')){ owner=p[0]; repo=p[1]; }
-    return {owner, repo, branch:'main'};
-  }catch(e){ return {owner:'korvil-app', repo:'k-ai-app', branch:'main'}; }
-}
-let CFG = detectarRepo();
-let pastaAtual = 'kai-app/';
-let pendentes = []; // arquivos pra publicar {path, content}
-let historico = [];
+// DESTINO FIXO CERTO - É PRA CÁ QUE VAI PUBLICAR
+const OWNER='korvil-app', REPO='k-ai-app', BRANCH='main';
+const APP_URL='https://korvil-app.github.io/k-ai-app/kai-app';
+let pastaAtual='kai-app/';
+let pendentes=[];
 
-// ===== ATIVAR / SALVAR PRA SEMPRE =====
+function abrirApp(){ window.open(APP_URL,'_blank'); }
+function addMsg(q,t){ const d=document.getElementById('msgs'); const div=document.createElement('div'); div.className='msg'; div.textContent=q+': '+t; d.appendChild(div); d.scrollTop=9999; }
+function setStatus(t){ document.getElementById('status').textContent=t; }
+
 function ativar(){
   const t=document.getElementById('kaiToken').value.trim();
   const g=document.getElementById('groqKey').value.trim();
-  if(t) localStorage.setItem('KAI_TOKEN', t);
-  if(g) localStorage.setItem('GROQ_API_KEY', g);
-  document.getElementById('status').innerText = '✅ Ativado! Tokens salvos pra sempre neste navegador. Repo: '+CFG.owner+'/'+CFG.repo;
+  if(!t.startsWith('ghp_') && !t.startsWith('github_pat_')){ alert('KAI_TOKEN errado! Ele tem que começar com ghp_ . Você colou link do GitHub? Não pode, tem que ser o token.'); return; }
+  if(g && !g.startsWith('gsk_')){ alert('GROQ_API_KEY errada! Tem que começar com gsk_'); return; }
+  if(t) localStorage.setItem('KAI_TOKEN',t);
+  if(g) localStorage.setItem('GROQ_API_KEY',g);
+  setStatus('✅ ATIVADO! Token salvo. Pronto pra publicar em '+OWNER+'/'+REPO);
+  addMsg('Sistema','Ativado e salvo pra sempre.');
   carregarRepo();
 }
 window.onload=()=>{
-  document.getElementById('kaiToken').value = localStorage.getItem('KAI_TOKEN')||'';
-  document.getElementById('groqKey').value = localStorage.getItem('GROQ_API_KEY')||'';
-  if(localStorage.getItem('KAI_TOKEN')) document.getElementById('status').innerText='✅ Tokens já salvos. Pronto pra publicar em '+CFG.owner+'/'+CFG.repo;
+  document.getElementById('kaiToken').value=localStorage.getItem('KAI_TOKEN')||'';
+  document.getElementById('groqKey').value=localStorage.getItem('GROQ_API_KEY')||'';
+  if(localStorage.getItem('KAI_TOKEN')) setStatus('✅ Token já salvo. Pode clicar PUBLICAR.');
+  else setStatus('⚠️ Coloque o token ghp_ e clique Ativar.');
   carregarRepo();
-  addMsg('IA','Oi! Sou a K-AI. GROQ + Pollinations juntas. Peça pra criar algo que eu já deixo pronto pra publicar. Pasta atual: kai-app/');
+  addMsg('IA','Pronto! Peça algo que eu deixo pronto pra publicar em kai-app/');
 };
-function addMsg(q,t){ const d=document.getElementById('msgs'); d.innerHTML+=`<div class="msg"><b>${q}:</b> ${t}</div>`; d.scrollTop=9999; }
-function voltar(){ if(pastaAtual==='') return; let s=pastaAtual.replace(/\/$/,'').split('/'); s.pop(); pastaAtual=s.length? s.join('/')+'/':''; document.getElementById('pastaAtual').innerText=pastaAtual||'(raiz)'; carregarRepo(); }
+function voltar(){ if(pastaAtual==='')return; let s=pastaAtual.replace(/\/$/,'').split('/'); s.pop(); pastaAtual=s.length?s.join('/')+'/':''; document.getElementById('pastaAtual').textContent=pastaAtual||'(raiz)'; carregarRepo(); }
 
-// ===== EXPLORADOR DO REPO IGUAL GITHUB =====
 async function carregarRepo(){
-  const lista=document.getElementById('lista'); lista.innerHTML='Carregando...';
+  const lista=document.getElementById('lista'); lista.textContent='Carregando...';
   const token=localStorage.getItem('KAI_TOKEN')||'';
-  const url=`https://api.github.com/repos/${CFG.owner}/${CFG.repo}/contents/${pastaAtual}?ref=${CFG.branch}`;
   try{
-    const r=await fetch(url,{headers: token?{Authorization:'Bearer '+token}: {}});
-    if(!r.ok){ lista.innerHTML='Repo vazio ou sem token. Crie algo e clique PUBLICAR que eu crio tudo.<br><button onclick="publicarTudo()">Criar estrutura inicial</button>'; return; }
-    const arr=await r.json();
-    lista.innerHTML='';
-    if(!Array.isArray(arr)){ lista.innerHTML='Arquivo'; return; }
+    const r=await fetch('https://api.github.com/repos/'+OWNER+'/'+REPO+'/contents/'+pastaAtual+'?ref='+BRANCH,{headers:token?{Authorization:'Bearer '+token}:{}});
+    if(!r.ok){ lista.textContent='Repo vazio ou sem token. Clique PUBLICAR que eu crio a estrutura.'; return; }
+    const arr=await r.json(); lista.innerHTML='';
     arr.forEach(it=>{
-      const div=document.createElement('div'); div.className='item '+(it.type==='dir'?'folder':'file');
-      div.innerText=(it.type==='dir'?'📁 ':'📄 ')+it.name;
-      div.onclick=()=>{
-        if(it.type==='dir'){ pastaAtual=it.path+'/'; document.getElementById('pastaAtual').innerText=pastaAtual; carregarRepo(); }
-        else abrirArquivo(it.path);
-      };
+      const div=document.createElement('div'); div.className='item'; div.textContent=(it.type==='dir'?'📁 ':'📄 ')+it.name;
+      div.onclick=()=>{ if(it.type==='dir'){ pastaAtual=it.path+'/'; document.getElementById('pastaAtual').textContent=pastaAtual; carregarRepo(); } else abrirArquivo(it.path); };
       lista.appendChild(div);
     });
-  }catch(e){ lista.innerHTML='Erro: '+e.message; }
+  }catch(e){ lista.textContent='Erro: '+e.message; }
 }
 async function abrirArquivo(path){
   const token=localStorage.getItem('KAI_TOKEN')||'';
-  const r=await fetch(`https://api.github.com/repos/${CFG.owner}/${CFG.repo}/contents/${path}?ref=${CFG.branch}`,{headers:{Authorization:'Bearer '+token}});
+  const r=await fetch('https://api.github.com/repos/'+OWNER+'/'+REPO+'/contents/'+path+'?ref='+BRANCH,{headers:{Authorization:'Bearer '+token}});
   const j=await r.json();
-  try{ document.getElementById('preview').innerText = atob(j.content.replace(/\n/g,'')); }catch(e){ document.getElementById('preview').innerText='Não consegui ler (binário ou grande).'; }
-  addMsg('Sistema','Aberto: '+path+' - se pedir "cria aqui dentro", vou usar a pasta dele.');
-  // Se abrir arquivo, pasta atual vira a pasta dele
-  let p=path.split('/'); p.pop(); pastaAtual=p.length? p.join('/')+'/':'';
-  document.getElementById('pastaAtual').innerText=pastaAtual||'(raiz)';
+  try{ document.getElementById('preview').textContent=decodeURIComponent(escape(atob(j.content.replace(/\n/g,'')))); }catch(e){ document.getElementById('preview').textContent='Não deu pra ler esse arquivo.'; }
+  let p=path.split('/'); p.pop(); pastaAtual=p.length?p.join('/')+'/':'';
+  document.getElementById('pastaAtual').textContent=pastaAtual||'(raiz)';
 }
 
-// ===== IA COMBINADA GROQ + POLLINATIONS =====
 async function chamarIA(promptUsuario){
   const groqKey=localStorage.getItem('GROQ_API_KEY')||'';
-  let respostaGroq='', respostaPoll='';
-  // 1 - GROQ
+  let groq='';
   if(groqKey){
     try{
-      const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+groqKey},body:JSON.stringify({model:'openai/gpt-oss-120b',messages:[{role:'system',content:'Você é K-AI, cria códigos completos, móveis, sem caminho fixo, usando ./ e caminhos relativos. Sempre responda com blocos ```html ou ```js ou ```css ou ```json com o código completo. Pasta padrão: kai-app/'},{role:'user',content:promptUsuario}],temperature:0.7})});
-      const j=await r.json(); respostaGroq=j.choices?.[0]?.message?.content||'';
-    }catch(e){ respostaGroq=''; }
+      const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+groqKey},body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:'Você é K-AI. Responda SEMPRE com um único bloco ```html com o código completo. Use caminhos relativos ./ . Nada de caminho fixo.'},{role:'user',content:promptUsuario}]})});
+      const j=await r.json(); groq=j.choices?.[0]?.message?.content||'';
+    }catch(e){}
   }
-  // 2 - Pollinations (grátis, sem chave) - como segunda opinião / complemento
-  try{
-    const r2=await fetch('https://text.pollinations.ai/'+encodeURIComponent('Complemente e melhore, crie código completo móvel: '+promptUsuario+' | Resposta anterior: '+respostaGroq.slice(0,2000)));
-    respostaPoll=await r2.text();
-  }catch(e){ respostaPoll=''; }
-  // 3 - COMBINAR como 1 IA só
-  let combinada = respostaGroq || respostaPoll;
-  if(respostaGroq && respostaPoll && respostaPoll.length>200){
-    combinada = respostaGroq + '\n\n<!-- MELHORIA POLLINATIONS -->\n' + respostaPoll.slice(0,3000);
-  }
-  return combinada || 'Não consegui chamar a IA. Verifique a GROQ_API_KEY e tente de novo.';
+  let poll='';
+  try{ const r2=await fetch('https://text.pollinations.ai/'+encodeURIComponent('Crie código html completo e móvel para: '+promptUsuario)); poll=await r2.text(); }catch(e){}
+  return groq || poll || 'Falha na IA. Verifique a chave GROQ.';
 }
 
-// ===== ENTENDER ONDE CRIAR: caminho falado / link / pasta aberta =====
 function resolverCaminho(texto){
-  // Link completo do GitHub
-  let m=texto.match(/github\.com\/[^\/]+\/[^\/]+\/(?:tree|blob)\/[^\/]+\/([^\s]+)/);
-  if(m) return m[1].replace(/\/$/,'')+'/';
-  // caminho tipo pasta/arquivo.html
-  let m2=texto.match(/([a-zA-Z0-9_\-\.\/]+\.(html|js|css|json|md|txt))/i);
-  if(m2){
-    let full=m2[1];
-    if(full.includes('/')) return full;
-    return pastaAtual + full;
-  }
-  // Só nome ou "cria aqui dentro"
-  return pastaAtual;
-}
-function extrairArquivos(respostaIA, nomePadrao){
-  let arquivos=[];
-  const regex=/```(html|js|css|json|md|txt)?\n([\s\S]*?)```/g;
-  let mm; let i=0;
-  while((mm=regex.exec(respostaIA))!==null){
-    let ext=mm[1]||'html'; if(ext==='html') ext='html';
-    let path=nomePadrao;
-    if(i>0) path=path.replace(/\.html$/, '-'+(i+1)+'.html');
-    // Se nome não tem extensão, coloca
-    if(!path.includes('.')) path+='.'+ext;
-    arquivos.push({path, content:mm[2]});
-    i++;
-  }
-  if(arquivos.length===0) arquivos.push({path:nomePadrao, content:respostaIA});
-  return arquivos;
+  let m=texto.match(/([a-zA-Z0-9_\-\/]+\.(html|js|css|json))/i);
+  if(m){ let f=m[1]; if(f.includes('/')) return f; return pastaAtual+f; }
+  return pastaAtual+'index.html';
 }
 
 async function enviar(){
   const inp=document.getElementById('prompt'); const texto=inp.value.trim(); if(!texto) return;
-  addMsg('Você', texto); inp.value='';
-  addMsg('IA','Pensando com GROQ + Pollinations... criando e deixando pronto pra publicar...');
+  addMsg('Você',texto); inp.value='';
+  addMsg('IA','Criando com GROQ + Pollinations...');
   const caminho=resolverCaminho(texto);
-  const promptFinal=`Crie completo: ${texto}. Destino: ${caminho}. Pasta atual aberta: ${pastaAtual}. Use caminhos relativos ./ , sem link fixo de repo, sem nome fixo de dono. Crie dentro de kai-app/ o máximo possível.`;
-  const resposta=await chamarIA(promptFinal);
-  const arquivos=extrairArquivos(resposta, caminho.endsWith('/')? caminho+'index.html' : caminho);
-  arquivos.forEach(a=>{ pendentes.push(a); });
-  document.getElementById('preview').innerText=resposta.slice(0,8000);
-  addMsg('IA',`Pronto! ${arquivos.length} arquivo(s) prontos: ${arquivos.map(a=>a.path).join(', ')}. Clique em PUBLICAR no topo pra commitar de verdade no GitHub.`);
-  // Auto-melhoria: se resposta fala que falta algo, já deixa sugestão
-  if(/falta|melhorar|erro/i.test(resposta)) addMsg('IA','Detectei que pode melhorar. Peça: "melhore isso e publique" que eu pesquiso e já atualizo.');
+  const resposta=await chamarIA(texto+' Destino: '+caminho+' Pasta atual: '+pastaAtual);
+  // CORRIGIDO: usa textContent, não innerHTML, pra não vazar código
+  document.getElementById('preview').textContent=resposta.slice(0,8000);
+  let code=resposta;
+  const mm=resposta.match(/```(?:html|js|css)?\n([\s\S]*?)```/);
+  if(mm) code=mm[1];
+  pendentes.push({path:caminho, content:code});
+  addMsg('IA','Pronto! Arquivo pronto: '+caminho+'. Clique PUBLICAR.');
 }
 
-// ===== PUBLICAR = COMMIT REAL VIA API DO GITHUB =====
+function b64(str){ return btoa(unescape(encodeURIComponent(str))); }
+
 async function publicarTudo(){
   const token=localStorage.getItem('KAI_TOKEN');
-  if(!token){ alert('Coloque o KAI_TOKEN e clique Ativar primeiro.'); return; }
-  // Estrutura inicial obrigatória na primeira vez
+  if(!token){ alert('Falta ativar o KAI_TOKEN primeiro!'); return; }
   if(pendentes.length===0){
     pendentes=[
-      {path:'kai-app/index.html', content:`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>KAI APP</title></head><body><h1>KAI APP - Móvel</h1><p>App criado pelo mestre.html. Caminhos relativos ./</p><script src="./app.js"></script></body></html>`},
-      {path:'kai-app/app.js', content:`// K-AI - Config móvel\nconst CFG={getRepo(){const p=location.pathname.split('/').filter(Boolean); return p[0]||'k-ai-app';}};\nconsole.log('KAI rodando móvel em', CFG.getRepo());\n// LOOP: criar > testar > corrigir > salvar > melhorar\nasync function loopAuto(){ console.log('Loop automático ativo'); }\nloopAuto();`},
-      {path:'kai-app/config.js', content:`// NÃO coloque chaves fixas aqui. Use localStorage KAI_TOKEN e GROQ_API_KEY\nwindow.KAI_CONFIG={base:'./', pastaPadrao:'kai-app/'};`},
-      {path:'kai-app/funcoes/criar.js', content:`// Função principal: criar arquivo - usa GitHub API com token do localStorage\nasync function criarArquivo(path, content){ return {path, content, ok:true}; }`},
-      {path:'kai-app/funcoes/atualizar.js', content:`// Função principal: atualizar arquivo\nasync function atualizarArquivo(path, content){ return criarArquivo(path, content); }`},
-      {path:'kai-app/funcoes/publicar.js', content:`// Função principal: publicar / commit\nasync function publicar(){ console.log('Publicar via mestre.html'); }`},
-      {path:'kai-app/funcoes/importar.js', content:`// Função principal: auto-import da internet\n// Quando detectar algo faltando, busca código aberto na internet e adapta com ./\nasync function autoImportar(tema){ const r=await fetch('https://text.pollinations.ai/'+encodeURIComponent('Me dê código completo móvel para: '+tema)); return await r.text(); }`},
-      {path:'kai-app/funcoes/loop.js', content:`// Loop automático: criar > testar > corrigir > salvar > melhorar\nasync function loop(){ /* cada melhoria gera nova melhoria */ }`},
-      {path:'kai-app/README.md', content:'# KAI APP\nCriado pelo mestre.html. Tudo móvel, sem caminho fixo. Pasta principal: kai-app/'},
+      {path:'kai-app/index.html', content:'<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>KAI APP</title><style>body{font-family:Arial;background:#0b0f14;color:#fff;text-align:center;padding:30px} a{color:#4ade80}</style></head><body><h1>✅ KAI APP FUNCIONANDO</h1><p>Publicado pelo mestre.html</p><p><a href="./">Atualizar</a></p><script src="./app.js"></script></body></html>'},
+      {path:'kai-app/app.js', content:'console.log("KAI APP rodando em ./kai-app");'},
+      {path:'kai-app/README.md', content:'# KAI APP\nApp publicado pelo mestre.html'}
     ];
-    addMsg('Sistema','Criando estrutura inicial completa em kai-app/ ...');
+    addMsg('Sistema','Criando estrutura inicial em kai-app/...');
   }
-  document.getElementById('status').innerText='Publicando '+pendentes.length+' arquivo(s) de verdade no GitHub...';
+  setStatus('Publicando '+pendentes.length+' arquivo(s)...');
   for(let f of pendentes){
     try{
-      // Pega SHA se já existir (pra atualizar)
       let sha=null;
-      let get=await fetch(`https://api.github.com/repos/${CFG.owner}/${CFG.repo}/contents/${f.path}?ref=${CFG.branch}`,{headers:{Authorization:'Bearer '+token}});
+      let get=await fetch('https://api.github.com/repos/'+OWNER+'/'+REPO+'/contents/'+f.path+'?ref='+BRANCH,{headers:{Authorization:'Bearer '+token}});
       if(get.ok){ let gj=await get.json(); sha=gj.sha; }
-      // btoa com UTF-8
-      let contentB64=btoa(unescape(encodeURIComponent(f.content)));
-      let body={message:'K-AI: criar/atualizar '+f.path+' via mestre.html', content:contentB64, branch:CFG.branch}; if(sha) body.sha=sha;
-      let put=await fetch(`https://api.github.com/repos/${CFG.owner}/${CFG.repo}/contents/${f.path}`,{method:'PUT',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify(body)});
-      if(!put.ok){ let e=await put.text(); addMsg('Erro','Falha em '+f.path+': '+e.slice(0,300)); }
-      else addMsg('✅ Publicado', f.path);
-    }catch(e){ addMsg('Erro', f.path+': '+e.message); }
+      let body={message:'K-AI: '+f.path, content:b64(f.content), branch:BRANCH}; if(sha) body.sha=sha;
+      let put=await fetch('https://api.github.com/repos/'+OWNER+'/'+REPO+'/contents/'+f.path,{method:'PUT',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify(body)});
+      if(put.ok) addMsg('✅ Publicado', f.path);
+      else { let e=await put.text(); addMsg('❌ Erro', f.path+' - '+e.slice(0,200)); }
+    }catch(e){ addMsg('❌ Erro', f.path+' - '+e.message); }
   }
   pendentes=[];
-  document.getElementById('status').innerText='✅ Publicado! Atualizando lista...';
-  setTimeout(carregarRepo, 1500);
+  setStatus('✅ Publicado! Abra o app: '+APP_URL);
+  setTimeout(carregarRepo,1500);
 }
 </script>
 </body>
