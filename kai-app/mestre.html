@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>K-AI MESTRE - CORRIGIDO</title>
+<title>K-AI MESTRE</title>
 <style>
 *{box-sizing:border-box} body{margin:0;font-family:Arial;background:#0b0f14;color:#fff;display:flex;flex-direction:column;height:100vh}
 header{padding:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:#111827}
@@ -14,23 +14,23 @@ main{flex:1;display:flex;overflow:hidden} #repo{width:42%;overflow:auto;padding:
 .item{padding:9px;border-radius:8px;cursor:pointer} .item:hover{background:#1f2937}
 pre{white-space:pre-wrap;background:#000;padding:12px;border-radius:10px;word-break:break-word}
 #chatBar{border-top:1px solid #222;padding:10px;background:#111827} #msgs{max-height:160px;overflow:auto;margin-bottom:8px} .msg{padding:8px;background:#1f2937;border-radius:10px;margin:4px 0;word-break:break-word} .row{display:flex;gap:8px} #prompt{flex:1}
-.ok{color:#4ade80} .erro{color:#f87171}
 </style>
 </head>
 <body>
 <header>
 <b>K-AI 🤖</b>
 <input id="kaiToken" type="password" placeholder="KAI_TOKEN - começa com ghp_">
-<input id="groqKey" type="password" placeholder="GROQ_API_KEY - começa com gsk_">
+<input id="groqSupabaseKey" type="password" placeholder="GROQ_SUPABASE_KEY - começa com gsk_">
 <button onclick="ativar()">Ativar e Salvar</button>
 <button id="btnPub" onclick="publicarTudo()">🚀 PUBLICAR</button>
-<button class="ghost" onclick="abrirApp()">🌐 Abrir App Publicado</button>
+<button class="ghost" onclick="abrirApp()">🌐 Abrir App</button>
+<button class="ghost" onclick="abrirGithub()">📁 Ver no GitHub</button>
 </header>
 <div style="padding:8px 12px;font-size:13px">
 <span id="status">Carregando...</span> | Pasta: <b id="pastaAtual">kai-app/</b>
 <button class="ghost" onclick="voltar()">⬅ Voltar</button>
 <button class="ghost" onclick="carregarRepo()">🔄 Atualizar</button>
-<br>Destino final: <b>https://korvil-app.github.io/k-ai-app/kai-app</b>
+<br>App: <b>https://korvil-app.github.io/k-ai-app/kai-app</b> | GitHub: <b>https://github.com/korvil-app/k-ai-app/tree/main/kai-app</b>
 </div>
 <main>
 <div id="repo"><b>📁 Repositório</b><div id="lista"></div></div>
@@ -38,37 +38,37 @@ pre{white-space:pre-wrap;background:#000;padding:12px;border-radius:10px;word-br
 </main>
 <div id="chatBar"><div id="msgs"></div>
 <div class="row"><input id="prompt" placeholder="Ex: cria loja.html de roupas"><button onclick="enviar()">Enviar</button></div>
-<div style="font-size:12px;opacity:.7">Tudo vai pra kai-app/ . Não cole link do GitHub na caixa do token.</div>
 </div>
 <script>
-// DESTINO FIXO CERTO - É PRA CÁ QUE VAI PUBLICAR
 const OWNER='korvil-app', REPO='k-ai-app', BRANCH='main';
 const APP_URL='https://korvil-app.github.io/k-ai-app/kai-app';
+const GITHUB_URL='https://github.com/korvil-app/k-ai-app/tree/main/kai-app';
 let pastaAtual='kai-app/';
 let pendentes=[];
 
 function abrirApp(){ window.open(APP_URL,'_blank'); }
+function abrirGithub(){ window.open(GITHUB_URL,'_blank'); }
 function addMsg(q,t){ const d=document.getElementById('msgs'); const div=document.createElement('div'); div.className='msg'; div.textContent=q+': '+t; d.appendChild(div); d.scrollTop=9999; }
 function setStatus(t){ document.getElementById('status').textContent=t; }
 
+// ===== ATIVAR COM GROQ_SUPABASE_KEY =====
 function ativar(){
   const t=document.getElementById('kaiToken').value.trim();
-  const g=document.getElementById('groqKey').value.trim();
-  if(!t.startsWith('ghp_') && !t.startsWith('github_pat_')){ alert('KAI_TOKEN errado! Ele tem que começar com ghp_ . Você colou link do GitHub? Não pode, tem que ser o token.'); return; }
-  if(g && !g.startsWith('gsk_')){ alert('GROQ_API_KEY errada! Tem que começar com gsk_'); return; }
+  const g=document.getElementById('groqSupabaseKey').value.trim();
+  if(!t.startsWith('ghp_') && !t.startsWith('github_pat_')){ alert('KAI_TOKEN errado! Tem que começar com ghp_'); return; }
+  if(g && !g.startsWith('gsk_')){ alert('GROQ_SUPABASE_KEY errada! Tem que começar com gsk_'); return; }
   if(t) localStorage.setItem('KAI_TOKEN',t);
-  if(g) localStorage.setItem('GROQ_API_KEY',g);
-  setStatus('✅ ATIVADO! Token salvo. Pronto pra publicar em '+OWNER+'/'+REPO);
-  addMsg('Sistema','Ativado e salvo pra sempre.');
+  if(g) localStorage.setItem('GROQ_SUPABASE_KEY',g);
+  setStatus('✅ ATIVADO! GROQ_SUPABASE_KEY + KAI_TOKEN salvos pra sempre.');
+  addMsg('Sistema','Ativado com GROQ_SUPABASE_KEY.');
   carregarRepo();
 }
 window.onload=()=>{
   document.getElementById('kaiToken').value=localStorage.getItem('KAI_TOKEN')||'';
-  document.getElementById('groqKey').value=localStorage.getItem('GROQ_API_KEY')||'';
-  if(localStorage.getItem('KAI_TOKEN')) setStatus('✅ Token já salvo. Pode clicar PUBLICAR.');
-  else setStatus('⚠️ Coloque o token ghp_ e clique Ativar.');
+  document.getElementById('groqSupabaseKey').value=localStorage.getItem('GROQ_SUPABASE_KEY')||'';
+  if(localStorage.getItem('KAI_TOKEN')) setStatus('✅ Tokens já salvos. Pode clicar PUBLICAR.');
+  else setStatus('⚠️ Coloque KAI_TOKEN + GROQ_SUPABASE_KEY e clique Ativar.');
   carregarRepo();
-  addMsg('IA','Pronto! Peça algo que eu deixo pronto pra publicar em kai-app/');
 };
 function voltar(){ if(pastaAtual==='')return; let s=pastaAtual.replace(/\/$/,'').split('/'); s.pop(); pastaAtual=s.length?s.join('/')+'/':''; document.getElementById('pastaAtual').textContent=pastaAtual||'(raiz)'; carregarRepo(); }
 
@@ -77,7 +77,7 @@ async function carregarRepo(){
   const token=localStorage.getItem('KAI_TOKEN')||'';
   try{
     const r=await fetch('https://api.github.com/repos/'+OWNER+'/'+REPO+'/contents/'+pastaAtual+'?ref='+BRANCH,{headers:token?{Authorization:'Bearer '+token}:{}});
-    if(!r.ok){ lista.textContent='Repo vazio ou sem token. Clique PUBLICAR que eu crio a estrutura.'; return; }
+    if(!r.ok){ lista.textContent='Repo vazio ou sem token. Clique PUBLICAR.'; return; }
     const arr=await r.json(); lista.innerHTML='';
     arr.forEach(it=>{
       const div=document.createElement('div'); div.className='item'; div.textContent=(it.type==='dir'?'📁 ':'📄 ')+it.name;
@@ -90,58 +90,51 @@ async function abrirArquivo(path){
   const token=localStorage.getItem('KAI_TOKEN')||'';
   const r=await fetch('https://api.github.com/repos/'+OWNER+'/'+REPO+'/contents/'+path+'?ref='+BRANCH,{headers:{Authorization:'Bearer '+token}});
   const j=await r.json();
-  try{ document.getElementById('preview').textContent=decodeURIComponent(escape(atob(j.content.replace(/\n/g,'')))); }catch(e){ document.getElementById('preview').textContent='Não deu pra ler esse arquivo.'; }
+  try{ document.getElementById('preview').textContent=decodeURIComponent(escape(atob(j.content.replace(/\n/g,'')))); }catch(e){ document.getElementById('preview').textContent='Não deu pra ler.'; }
   let p=path.split('/'); p.pop(); pastaAtual=p.length?p.join('/')+'/':'';
   document.getElementById('pastaAtual').textContent=pastaAtual||'(raiz)';
 }
 
+// ===== IA COMBINADA - AGORA USA GROQ_SUPABASE_KEY =====
 async function chamarIA(promptUsuario){
-  const groqKey=localStorage.getItem('GROQ_API_KEY')||'';
+  const groqKey=localStorage.getItem('GROQ_SUPABASE_KEY')||'';
   let groq='';
   if(groqKey){
     try{
-      const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+groqKey},body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:'Você é K-AI. Responda SEMPRE com um único bloco ```html com o código completo. Use caminhos relativos ./ . Nada de caminho fixo.'},{role:'user',content:promptUsuario}]})});
+      const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+groqKey},body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:'Você é K-AI. Responda SEMPRE com um único bloco ```html com o código completo. Use caminhos relativos ./'},{role:'user',content:promptUsuario}]})});
       const j=await r.json(); groq=j.choices?.[0]?.message?.content||'';
     }catch(e){}
   }
   let poll='';
   try{ const r2=await fetch('https://text.pollinations.ai/'+encodeURIComponent('Crie código html completo e móvel para: '+promptUsuario)); poll=await r2.text(); }catch(e){}
-  return groq || poll || 'Falha na IA. Verifique a chave GROQ.';
+  return groq || poll || 'Falha na IA. Verifique a GROQ_SUPABASE_KEY.';
 }
-
 function resolverCaminho(texto){
   let m=texto.match(/([a-zA-Z0-9_\-\/]+\.(html|js|css|json))/i);
   if(m){ let f=m[1]; if(f.includes('/')) return f; return pastaAtual+f; }
   return pastaAtual+'index.html';
 }
-
 async function enviar(){
   const inp=document.getElementById('prompt'); const texto=inp.value.trim(); if(!texto) return;
   addMsg('Você',texto); inp.value='';
-  addMsg('IA','Criando com GROQ + Pollinations...');
+  addMsg('IA','Criando com GROQ_SUPABASE_KEY + Pollinations...');
   const caminho=resolverCaminho(texto);
-  const resposta=await chamarIA(texto+' Destino: '+caminho+' Pasta atual: '+pastaAtual);
-  // CORRIGIDO: usa textContent, não innerHTML, pra não vazar código
+  const resposta=await chamarIA(texto+' Destino: '+caminho);
   document.getElementById('preview').textContent=resposta.slice(0,8000);
-  let code=resposta;
-  const mm=resposta.match(/```(?:html|js|css)?\n([\s\S]*?)```/);
-  if(mm) code=mm[1];
+  let code=resposta; const mm=resposta.match(/```(?:html|js|css)?\n([\s\S]*?)```/); if(mm) code=mm[1];
   pendentes.push({path:caminho, content:code});
-  addMsg('IA','Pronto! Arquivo pronto: '+caminho+'. Clique PUBLICAR.');
+  addMsg('IA','Pronto! '+caminho+' - Clique PUBLICAR.');
 }
-
 function b64(str){ return btoa(unescape(encodeURIComponent(str))); }
-
 async function publicarTudo(){
   const token=localStorage.getItem('KAI_TOKEN');
-  if(!token){ alert('Falta ativar o KAI_TOKEN primeiro!'); return; }
+  if(!token){ alert('Falta ativar o KAI_TOKEN!'); return; }
   if(pendentes.length===0){
     pendentes=[
-      {path:'kai-app/index.html', content:'<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>KAI APP</title><style>body{font-family:Arial;background:#0b0f14;color:#fff;text-align:center;padding:30px} a{color:#4ade80}</style></head><body><h1>✅ KAI APP FUNCIONANDO</h1><p>Publicado pelo mestre.html</p><p><a href="./">Atualizar</a></p><script src="./app.js"></script></body></html>'},
-      {path:'kai-app/app.js', content:'console.log("KAI APP rodando em ./kai-app");'},
-      {path:'kai-app/README.md', content:'# KAI APP\nApp publicado pelo mestre.html'}
+      {path:'kai-app/index.html', content:'<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>KAI APP</title><style>body{font-family:Arial;background:#0b0f14;color:#fff;text-align:center;padding:30px}</style></head><body><h1>✅ KAI APP FUNCIONANDO</h1><p>Publicado pelo mestre.html com GROQ_SUPABASE_KEY</p><script src="./app.js"></script></body></html>'},
+      {path:'kai-app/app.js', content:'console.log("KAI APP rodando");'},
+      {path:'kai-app/README.md', content:'# KAI APP'}
     ];
-    addMsg('Sistema','Criando estrutura inicial em kai-app/...');
   }
   setStatus('Publicando '+pendentes.length+' arquivo(s)...');
   for(let f of pendentes){
@@ -151,13 +144,10 @@ async function publicarTudo(){
       if(get.ok){ let gj=await get.json(); sha=gj.sha; }
       let body={message:'K-AI: '+f.path, content:b64(f.content), branch:BRANCH}; if(sha) body.sha=sha;
       let put=await fetch('https://api.github.com/repos/'+OWNER+'/'+REPO+'/contents/'+f.path,{method:'PUT',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify(body)});
-      if(put.ok) addMsg('✅ Publicado', f.path);
-      else { let e=await put.text(); addMsg('❌ Erro', f.path+' - '+e.slice(0,200)); }
+      if(put.ok) addMsg('✅ Publicado', f.path); else { let e=await put.text(); addMsg('❌ Erro', f.path+' - '+e.slice(0,200)); }
     }catch(e){ addMsg('❌ Erro', f.path+' - '+e.message); }
   }
-  pendentes=[];
-  setStatus('✅ Publicado! Abra o app: '+APP_URL);
-  setTimeout(carregarRepo,1500);
+  pendentes=[]; setStatus('✅ Publicado! Abra o app: '+APP_URL); setTimeout(carregarRepo,1500);
 }
 </script>
 </body>
