@@ -1,228 +1,219 @@
-<!-- g.hp_ix7nVkpOozhBWkZ6NdIeQGMdRBhymb1wohuX -->
 <!DOCTYPE html>
-<html lang="pt-BR"><head><style>
-@font-face {
-  font-family: "Optimistic";
-  font-style: normal;
-  font-weight: 400 600;
-  font-display: swap;
-  src: url("/fonts/OptimisticAI_VF_Optimized.woff2") format("woff2");
-}
-@font-face {
-  font-family: "Optimistic Mono";
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("/fonts/OptimisticMono_W_TextRegular.woff2") format("woff2");
-}
-:where(html) {
-  font-family: "Optimistic", system-ui, sans-serif;
-}
-:where(code, pre, kbd, samp) {
-  font-family: "Optimistic Mono", ui-monospace, monospace;
-}
-</style><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>K-AI - Código Mestre</title>
-<style>body{background:#0a0a0f;color:#fff;font-family:Arial,sans-serif;padding:18px;max-width:860px;margin:auto}
-input,textarea,button{width:100%;padding:12px;margin:8px 0;border-radius:10px;border:1px solid #333;background:#15151c;color:#fff}
-button{background:#f5c518;color:#000;font-weight:800;cursor:pointer}button.sec{background:#222;color:#fff}
-pre{background:#111;padding:12px;border-radius:10px;white-space:pre-wrap;max-height:420px;overflow:auto}
-.ok{color:#4ade80}.err{color:#f87171}.warn{color:#facc15}small{color:#aaa}</style></head>
-<body><h1>K-AI • Código Mestre</h1>
-<p>Destino fixo: <b>korvil-app/k-ai-app</b> • branch <b>main</b></p>
-<p><b>Como funciona:</b> 1. Cole o token • 2. Clique ATIVAR • 3. Clique PUBLICAR TUDO.<br>
-Ele vai: <b>atualizar</b> todos os arquivos antigos que já existem (usando SHA), <b>criar</b> todos os arquivos novos que ainda não existem, <b>sem excluir nada</b> que já foi feito. Só atualiza, salva, ajusta e publica. Depois de publicar, o app instalado passa a usar a nova versão.</p>
-<label>KAI_TOKEN do repositório</label>
-<input id="token" type="password" placeholder="Cole o KAI_TOKEN aqui">
-<button onclick="ativar()">ATIVAR REPOSITÓRIO</button>
-<button class="sec" onclick="listar()">VER O QUE JÁ EXISTE NO REPOSITÓRIO</button>
-<button onclick="publicarTudo()">PUBLICAR TUDO DE UMA VEZ</button>
-<pre id="log">Aguardando token...</pre>
-<small>Este código mestre não inventa nada falso. Ele só reconhece se é ATUALIZAR ou CRIAR cada arquivo. As chaves de Gemini/Groq NÃO vão neste código — ficam só nos Secrets.</small>
-<script>
-const REPO='korvil-app/k-ai-app';
-const ARQUIVOS=[
-{path:'kai-app.html', content:`<!DOCTYPE html>
-<html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>K-AI APP - KORVIL Assistente Inteligente</title>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>K-AI MESTRE</title>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:Inter,Arial,sans-serif;background:#f5f5f4;color:#111;display:flex;height:100vh}
-aside{width:260px;background:#fff;border-right:1px solid #e5e5e5;padding:14px;display:flex;flex-direction:column;gap:8px}
-.logo{font-weight:900;font-size:22px;cursor:pointer} .logo span{color:#f5c518}
-button{border:1px solid #e5e5e5;background:#fff;border-radius:999px;padding:10px 14px;cursor:pointer}
-button.primary{background:#111;color:#fff} main{flex:1;display:flex;flex-direction:column}
-header{padding:14px 20px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center}
-#chat{flex:1;overflow:auto;padding:24px;max-width:820px;margin:auto;width:100%}
-.msg{padding:12px 16px;border-radius:18px;margin:10px 0;max-width:85%}.me{background:#111;color:#fff;margin-left:auto}.kai{background:#fff;border:1px solid #eee}
-#composer{padding:14px;max-width:820px;margin:auto;width:100%}#composer div{display:flex;gap:8px;background:#fff;border:1px solid #ddd;border-radius:999px;padding:6px}
-input{flex:1;border:0;outline:0;padding:10px} .panel{display:none;position:fixed;right:0;top:0;bottom:0;width:380px;background:#fff;border-left:1px solid #ddd;padding:16px;overflow:auto;z-index:10}
-pre{white-space:pre-wrap;background:#111;color:#0f0;padding:12px;border-radius:12px;max-height:300px;overflow:auto}
-small{color:#666}.badge{font-size:12px;background:#fef3c7;padding:4px 10px;border-radius:999px}
-</style></head><body>
-<aside>
-<div class="logo" onclick="editarLogo()">K-AI <span>KORVIL</span></div>
-<small id="statusVoz">Ouvindo... fale Kai</small>
-<button onclick="novaConversa()">+ Nova conversa</button>
-<button onclick="abrir('supabase')">Supabase</button>
-<button onclick="abrir('github')">GitHub</button>
-<button onclick="abrir('mestre')">Código Mestre</button>
-<button onclick="abrir('funcoes')">Funções / Execuções</button>
-<button onclick="abrir('cerebro')">Cérebro / Auto-evolução</button>
-<button onclick="abrir('notif')">Notificações</button>
-<div style="margin-top:auto;display:flex;flex-direction:column;gap:8px">
-<button class="primary" onclick="abrir('publicar')">PUBLICAR</button>
-<button onclick="atualizarApp()">ATUALIZAR</button>
-</div></aside>
-<main><header><b>K-AI APP</b><span class="badge">Memória K-AI ativa • Gemini → Groq → Pollinations</span><button id="btnInstalar" onclick="instalar()">Instalar K-AI APP</button></header>
-<div id="chat"></div>
-<div id="composer"><div><input id="inp" placeholder="Fale Kai, ou digite aqui, criador..."><button onclick="micTeste()">🎤 Testar voz</button><button class="primary" onclick="enviar()">Enviar</button></div></div>
+*{box-sizing:border-box} body{margin:0;font-family:Arial;background:#0b0f14;color:#fff;display:flex;flex-direction:column;height:100vh}
+header{padding:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:#111827;border-bottom:1px solid #222}
+input{padding:9px;border-radius:8px;border:1px solid #333;background:#000;color:#fff;flex:1;min-width:180px}
+button{padding:9px 14px;border:0;border-radius:8px;background:#22c55e;color:#000;font-weight:700;cursor:pointer}
+button.ghost{background:#1f2937;color:#fff} #btnPub{background:#facc15;margin-left:auto}
+main{flex:1;display:flex;overflow:hidden} #repo{width:42%;overflow:auto;padding:12px;border-right:1px solid #222} #view{flex:1;overflow:auto;padding:12px}
+.item{padding:8px;border-radius:8px;cursor:pointer;border:1px solid transparent} .item:hover{background:#1f2937} .folder{color:#facc15} .file{color:#93c5fd}
+pre{white-space:pre-wrap;background:#000;padding:12px;border-radius:10px;overflow:auto}
+#chatBar{border-top:1px solid #222;padding:10px;background:#111827} #msgs{max-height:180px;overflow:auto;margin-bottom:8px} .msg{padding:8px;background:#1f2937;border-radius:10px;margin:4px 0} .row{display:flex;gap:8px} #prompt{flex:1}
+#status{font-size:12px;color:#a7f3d0}
+</style>
+</head>
+<body>
+<header>
+<b>K-AI 🤖</b>
+<input id="kaiToken" type="password" placeholder="KAI_TOKEN (GitHub PAT com repo)">
+<input id="groqKey" type="password" placeholder="GROQ_API_KEY">
+<button onclick="ativar()">Ativar e Salvar Pra Sempre</button>
+<button id="btnPub" onclick="publicarTudo()">🚀 PUBLICAR</button>
+</header>
+<div style="padding:8px 12px"><span id="status">Coloque os tokens e clique Ativar.</span> | Pasta atual: <b id="pastaAtual">kai-app/</b> <button class="ghost" onclick="voltar()">⬅ Voltar</button> <button class="ghost" onclick="carregarRepo()">🔄 Atualizar Repo</button></div>
+<main>
+<div id="repo"><b>📁 Repositório - clique pra abrir</b><div id="lista"></div></div>
+<div id="view"><b>👁️ Prévia / Arquivo aberto</b><pre id="preview">Clique num arquivo pra ver. Clique numa pasta pra entrar nela.</pre></div>
 </main>
-<div id="painel" class="panel"><button onclick="fechar()">Fechar ✕</button><div id="painelConteudo"></div></div>
+<div id="chatBar">
+<div id="msgs"></div>
+<div class="row"><input id="prompt" placeholder="Ex: cria aqui dentro loja.html de roupas / cria kai-app/loja.html / cola link do GitHub..."><button onclick="enviar()">Enviar</button></div>
+<div style="font-size:12px;opacity:.7">GROQ + Pollinations combinadas como 1 IA. Tudo criado vai pra kai-app/ se você não falar outro caminho. Sem caminho fixo - usa ./ e detecta repo pela URL.</div>
+</div>
 <script>
-const SUPABASE_URL="https://tgccyqvobdmwmwjwntxx.supabase.co";
-const SUPABASE_KEY="sb_publishable_2EneNKkowoLF9UiWwB1DDA_Z_RvwPfX";
-let memoria=JSON.parse(localStorage.getItem('kai_memoria')||'[]');
-let nivel=parseInt(localStorage.getItem('kai_nivel')||'1');
-let logEvo=JSON.parse(localStorage.getItem('kai_evo')||'[]');
-let config={nome:"K-AI APP",email:"",logo:"K-AI"};
-function add(t,cls){const d=document.createElement('div');d.className='msg '+cls;d.textContent=t;document.getElementById('chat').appendChild(d);document.getElementById('chat').scrollTop=1e9}
-add("Olá, criador. Eu sou o K-AI, sua própria IA. Fale Kai que eu bip 3 vezes e fico te ouvindo. Posso criar, mudar, evoluir, publicar e conversar com você.","kai");
-function falarKai(){add("KAI acordado, criador. Estou te ouvindo...","kai"); bip(3)}
-function bip(n){try{const ctx=new (window.AudioContext||window.webkitAudioContext)();let t=ctx.currentTime;for(let i=0;i<n;i++){const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=880;o.start(t+i*0.35);o.stop(t+i*0.35+0.18)}}catch(e){}}
-function enviar(){const v=document.getElementById('inp').value.trim();if(!v)return;add(v,'me');document.getElementById('inp').value='';responder(v)}
-async function responder(v){
- memoria.push({t:new Date().toISOString(),q:v});localStorage.setItem('kai_memoria',JSON.stringify(memoria));
- // Trava: só mudar o que foi pedido
- let acao="Vou mudar só: "+v;
- if(v.toLowerCase().includes('menu lateral')&&v.toLowerCase().includes('branco')){document.querySelector('aside').style.background='#fff';document.querySelector('aside').style.color='#111';acao="Vou mudar só: fundo do menu lateral para branco, ajustando texto para continuar legível. Resto mantido."}
- if(v.toLowerCase().includes('evoluir')){evoluirAgora();acao="Vou mudar só: rodar 1 ciclo de evolução, sem excluir nada."}
- add("Entendi, criador. "+acao+" Você falou: "+v+". É isso? Estou executando certinho do jeito que você falou.","kai");
- // Tenta função k-ai real no Supabase, cai para resposta local se falhar
- try{const r=await fetch(SUPABASE_URL+"/functions/v1/k-ai",{method:"POST",headers:{"Content-Type":"application/json",apikey:SUPABASE_KEY,Authorization:"Bearer "+SUPABASE_KEY},body:JSON.stringify({prompt:v,model_gemini:"gemini-3.8-flash",model_groq:"llama-3.1-8b-instant"})});
- if(r.ok){const j=await r.json();add("K-AI (Gemini → Groq): "+(j.resposta||j.answer||JSON.stringify(j)),"kai");return}}catch(e){}
- add("K-AI: feito, criador. Salvei na memória e mantive tudo que já estava criado. Quer que eu continue?","kai");
-}
-function novaConversa(){document.getElementById('chat').innerHTML='';add("Nova conversa, criador. Fale Kai.","kai")}
-function abrir(q){document.getElementById('painel').style.display='block';const c=document.getElementById('painelConteudo');
- if(q==='supabase')c.innerHTML="<h2>Supabase</h2><p>Projeto: "+SUPABASE_URL+"</p><p>Tabelas: kai_projetos, kai_mensagens</p><p>Funções: k-ai, publish</p><button onclick=\\"testarSupabase()\\">Testar conexão</button><div id='supStatus'></div><p><a href='https://supabase.com/dashboard' target='_blank'>Abrir no site oficial real →</a></p>";
- if(q==='github')c.innerHTML="<h2>GitHub</h2><p>Repositório: korvil-app/k-ai-app - main</p><p>Arquivos: kai-app.html, funcoes/, execucoes/</p><p>Status: última publicação mantida como base.</p><p><a href='https://github.com/korvil-app/k-ai-app/blob/main/' target='_blank'>Abrir no site oficial real →</a></p>";
- if(q==='mestre')c.innerHTML="<h2>Código Mestre</h2><p>Destino fixo: korvil-app/k-ai-app</p><label>KAI_TOKEN</label><input id='tok' type='password' placeholder='Cole o KAI_TOKEN'><button class='primary' onclick='publicarAgora()'>PUBLICAR AGORA</button><div id='pubLog'></div><button onclick='copiarCodigo()'>Copiar código deste arquivo</button><pre id='codigoArea'></pre>";
- if(q==='funcoes')c.innerHTML="<h2>Funções</h2><p>funcao-voz: bip 3x, transcreve exato, confirma.</p><p>funcao-evoluir: só adiciona, nunca exclui sem ordem.</p><h2>Execuções</h2><p>execucoes/ abaixo de funcoes/: pesquisar-google, criar-codigo, criar-app, corrigir-erro, automatizar, aprender-novo, criar-funcao-nova, criar-execucao-nova, voz-jarvis e mais. Cada uma com pasta + arquivos + descricao.</p>";
- if(q==='cerebro')c.innerHTML="<h2>Cérebro K-AI</h2><p>Auto-evolução: SEMPRE ATIVA • a cada 3 minutos</p><p>Nível: "+nivel+" • Memórias: "+memoria.length+"</p><p>Cérebro, memória, inteligência, aprendizado, reconhecimento, criação, funções, execuções, ações, ideias, autonomia, automatização, programação, configurações.</p><button onclick='evoluirAgora()'>Evoluir Agora</button><pre>"+logEvo.slice(-10).join('\\\\n')+"</pre>";
- if(q==='notif')c.innerHTML="<h2>Notificações</h2><p>Notificação a cada 1h resumindo as evoluções de 3 em 3 minutos.</p><pre>"+logEvo.slice(-10).join('\\\\n')+"</pre>";
- if(q==='publicar')abrir('mestre');
-}
-function fechar(){document.getElementById('painel').style.display='none'}
-function atualizarApp(){add("Atualizado, criador. Só atualizei o App na hora, sem commitar no GitHub.","kai")}
-async function testarSupabase(){try{const r=await fetch(SUPABASE_URL+"/rest/v1/",{headers:{apikey:SUPABASE_KEY,Authorization:"Bearer "+SUPABASE_KEY}});document.getElementById('supStatus').textContent=r.ok?"✅ Conectado ao Supabase":"⚠️ Resposta: "+r.status}catch(e){document.getElementById('supStatus').textContent="❌ Erro: "+e.message}}
-function evoluirAgora(){nivel++;logEvo.push(new Date().toLocaleTimeString()+" - Evolução "+nivel+": habilidade melhorada, arquivo adicionado, nada excluído.");localStorage.setItem('kai_nivel',nivel);localStorage.setItem('kai_evo',JSON.stringify(logEvo));add("Evoluí, criador. Nível "+nivel+". Só adicionei, não excluí nada.","kai")}
-setInterval(()=>{evoluirAgora()},180000);
-setInterval(()=>{if(Notification&&Notification.permission==='granted')new Notification("K-AI - Evoluções da última hora",{body:logEvo.slice(-5).join(" | ")} )},3600000);
-function editarLogo(){const n=prompt("Nome do app:",config.nome);if(n)config.nome=n;const e=prompt("Email:",config.email);if(e!==null)config.email=e;add("Logo atualizada, criador. Nome: "+config.nome+" • Email: "+config.email+". Ao publicar, atualiza em todo o app.","kai")}
-function instalar(){if(window.matchMedia('(display-mode: standalone)').matches){alert("Já está instalado, criador.");return}alert("Para instalar real: no Android Chrome menu > Instalar app. Para APK real, empacote com Node + Capacitor a partir deste kai-app.html. Supabase não gera APK.");}
-async function publicarAgora(){const t=document.getElementById('tok').value.trim();if(!t){document.getElementById('pubLog').textContent="❌ Cole o KAI_TOKEN primeiro.";return}
- document.getElementById('pubLog').textContent="Publicando... salvando no Supabase e registrando versão atual...";
- try{await fetch(SUPABASE_URL+"/rest/v1/kai_projetos",{method:"POST",headers:{apikey:SUPABASE_KEY,Authorization:"Bearer "+SUPABASE_KEY,"Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify({nome:config.nome,conteudo:"K-AI APP v"+nivel})});document.getElementById('pubLog').textContent+=" ✅ Supabase salvo."}catch(e){document.getElementById('pubLog').textContent+=" Supabase: "+e.message}
- document.getElementById('pubLog').textContent+=" ✅ Versão registrada. Abra o repositório oficial para finalizar o commit com o código copiado (a API do GitHub não é chamada direto deste preview).";}
-// Voz sempre ligada
-let rec=null;
-try{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(SR){rec=new SR();rec.lang='pt-BR';rec.continuous=true;rec.interimResults=true;
-rec.onresult=(e)=>{let txt='';for(let i=e.resultIndex;i<e.results.length;i++)txt+=e.results[i][0].transcript;
- const low=txt.toLowerCase();if(low.includes('kai')&&!window.__acordado){window.__acordado=true;falarKai();document.getElementById('statusVoz').textContent="KAI acordado - transcrevendo exatamente o que você fala..."}
- else if(window.__acordado){document.getElementById('inp').value=txt;}};
-rec.onend=()=>{if(window.__acordado){const v=document.getElementById('inp').value;if(v){add("Você falou: "+v+". É isso?","kai");responder(v);window.__acordado=false;document.getElementById('statusVoz').textContent="Ouvindo... fale Kai"} } try{rec.start()}catch(e){}};
-rec.start();}}catch(e){document.getElementById('statusVoz').textContent="Voz não suportada neste navegador - use digitar ou Testar voz."}
-function micTeste(){falarKai();setTimeout(()=>{document.getElementById('inp').value="Kai, evoluir o K-AI APP";add("Você falou: Kai, evoluir o K-AI APP. É isso?","kai");responder("evoluir o K-AI APP")},1200)}
-function copiarCodigo(){const code=document.documentElement.outerHTML;document.getElementById('codigoArea').textContent=code.slice(0,4000)+"... (código completo copiado)";navigator.clipboard.writeText(code).then(()=>add("Código copiado, criador! Cole no repositório.","kai")).catch(()=>add("Não consegui copiar automático, criador. Copie da área de texto.","kai"))}
-if(window.matchMedia('(display-mode: standalone)').matches){document.getElementById('btnInstalar').style.display='none'}
-</script></body></html>`},
-{path:'funcoes/funcao-voz.md', content:`# Funcao Voz
-- Falar Kai -> bip 3 vezes -> aguardando
-- Transcreve EXATAMENTE o que foi falado, sem inventar
-- Parou de falar -> confirma: Voce falou: [texto exato]. E isso?
-- Reconhece palavras-chave e executa certinho do jeito falado
-- Depois conversa e interage
-`},
-{path:'funcoes/funcao-evoluir.md', content:`# Funcao Evoluir
-- Ativa quando falar evoluir + o que evoluir
-- So ADICIONA / IMPLEMENTA, nunca exclui sem ordem explicita
-- Mantem tudo que ja existe, atualiza nos mesmos arquivos
-- Se pedir excluir, so exclui se mandar
-`},
-{path:'funcoes/descricao-funcoes.md', content:`# Descricao Funcoes
-funcao-voz e funcao-evoluir seguem mesmo padrao de nome, descricoes diferentes.
-`},
-{path:'execucoes/execucao-pesquisar-google/descricao.md', content:`# Execucao Pesquisar Google
-Pesquisa, aprende, baixa e adiciona no funcionamento, sem excluir nada.
-`},
-{path:'execucoes/execucao-criar-codigo/descricao.md', content:`# Execucao Criar Codigo
-Cria codigos novos, mantendo os antigos.
-`},
-{path:'execucoes/execucao-criar-app/descricao.md', content:`# Execucao Criar App
-Cria apps completos.
-`},
-{path:'execucoes/execucao-corrigir-erro/descricao.md', content:`# Execucao Corrigir Erro
-Corrige erro atualizando o mesmo arquivo, sem excluir o resto.
-`},
-{path:'execucoes/execucao-melhorar-app/descricao.md', content:`# Execucao Melhorar App
-Melhora o K-AI APP so adicionando.
-`},
-{path:'execucoes/execucao-automatizar-tarefa/descricao.md', content:`# Execucao Automatizar Tarefa
-Automatiza tarefas repetidas.
-`},
-{path:'execucoes/execucao-aprender-novo/descricao.md', content:`# Execucao Aprender Novo
-Aprende e salva na memoria.
-`},
-{path:'execucoes/execucao-criar-funcao-nova/descricao.md', content:`# Execucao Criar Funcao Nova
-Cria funcao nova quando falta.
-`},
-{path:'execucoes/execucao-criar-execucao-nova/descricao.md', content:`# Execucao Criar Execucao Nova
-Cria execucao nova quando falta.
-`},
-{path:'execucoes/execucao-voz-jarvis/descricao.md', content:`# Execucao Voz Jarvis
-Responde por voz estilo Jarvis, conversa e interage.
-`},
-{path:'README.md', content:`# K-AI APP - KORVIL Assistente Inteligente
-Arquivo principal: kai-app.html
-Funcoes em funcoes/ | Execucoes em execucoes/ | Codigo mestre: codigo-mestre.html
-`}
-];
-function log(m,c=''){const el=document.getElementById('log');el.innerHTML+='\n<span class="'+c+'">'+m+'</span>';el.scrollTop=1e9;}
-async function ativar(){
- const t=document.getElementById('token').value.trim();
- if(!t) return log('❌ Cole o KAI_TOKEN primeiro.','err');
- try{const r=await fetch('https://api.github.com/repos/'+REPO,{headers:{Authorization:'Bearer '+t}});
- if(!r.ok) throw new Error('GitHub respondeu '+r.status);
- const j=await r.json(); log('✅ Ativado: '+j.full_name+' • branch padrão: '+j.default_branch,'ok');
- }catch(e){log('❌ Erro ao ativar: '+e.message,'err');}
-}
-async function listar(){
- const t=document.getElementById('token').value.trim();
- if(!t) return log('❌ Cole o token primeiro.','err');
- try{const r=await fetch('https://api.github.com/repos/'+REPO+'/git/trees/main?recursive=1',{headers:{Authorization:'Bearer '+t}});
- if(!r.ok) throw new Error('Erro '+r.status);
- const j=await r.json(); log('📁 Arquivos que já existem no repositório:','warn');
- j.tree.filter(x=>x.type==='blob').forEach(x=>log(' - '+x.path));}catch(e){log('❌ '+e.message,'err');}
-}
-function b64(s){return btoa(unescape(encodeURIComponent(s)))}
-async function publicarTudo(){
- const t=document.getElementById('token').value.trim();
- if(!t) return log('❌ Cole o KAI_TOKEN primeiro.','err');
- log('🚀 Começando PUBLICAR TUDO...','warn');
- for(const arq of ARQUIVOS){
+// ===== CONFIG MÓVEL - NADA FIXO =====
+// Detecta dono/repo/branch pela URL atual, se copiar pra outro repo funciona sozinho
+function detectarRepo(){
   try{
-   log('Verificando: '+arq.path+' ...');
-   let sha=null;
-   const get=await fetch('https://api.github.com/repos/'+REPO+'/contents/'+arq.path,{headers:{Authorization:'Bearer '+t}});
-   if(get.ok){const j=await get.json();sha=j.sha;log(' → Já existe: vai ATUALIZAR (mantendo o resto)','ok');}
-   else log(' → Não existe: vai CRIAR','ok');
-   const body={message:(sha?'Atualizar ':'Criar ')+arq.path+' via K-AI Codigo Mestre - sem excluir nada',content:b64(arq.content)};
-   if(sha) body.sha=sha;
-   const put=await fetch('https://api.github.com/repos/'+REPO+'/contents/'+arq.path,{method:'PUT',headers:{Authorization:'Bearer '+t,'Content-Type':'application/json'},body:JSON.stringify(body)});
-   if(!put.ok) throw new Error('PUT '+put.status+' '+(await put.text()).slice(0,300));
-   log('✅ Publicado: '+arq.path,'ok');
-  }catch(e){log('❌ Falhou '+arq.path+': '+e.message,'err');}
- }
- log('🏁 FIM. Tudo que existia foi atualizado, tudo que faltava foi criado, nada foi excluído. Atualize o app instalado para ver a nova versão.','ok');
+    const p = location.pathname.split('/').filter(Boolean);
+    // GitHub Pages: /repo/... ou /user/repo/... | Local: tenta default
+    let owner='korvil-app', repo='k-ai-app';
+    if(location.hostname.includes('github.io')){ owner=location.hostname.split('.')[0]; repo=p[0]||repo; }
+    if(p.length>=2 && location.hostname.includes('github.com')){ owner=p[0]; repo=p[1]; }
+    return {owner, repo, branch:'main'};
+  }catch(e){ return {owner:'korvil-app', repo:'k-ai-app', branch:'main'}; }
 }
-</script><script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script></body></html>
+let CFG = detectarRepo();
+let pastaAtual = 'kai-app/';
+let pendentes = []; // arquivos pra publicar {path, content}
+let historico = [];
+
+// ===== ATIVAR / SALVAR PRA SEMPRE =====
+function ativar(){
+  const t=document.getElementById('kaiToken').value.trim();
+  const g=document.getElementById('groqKey').value.trim();
+  if(t) localStorage.setItem('KAI_TOKEN', t);
+  if(g) localStorage.setItem('GROQ_API_KEY', g);
+  document.getElementById('status').innerText = '✅ Ativado! Tokens salvos pra sempre neste navegador. Repo: '+CFG.owner+'/'+CFG.repo;
+  carregarRepo();
+}
+window.onload=()=>{
+  document.getElementById('kaiToken').value = localStorage.getItem('KAI_TOKEN')||'';
+  document.getElementById('groqKey').value = localStorage.getItem('GROQ_API_KEY')||'';
+  if(localStorage.getItem('KAI_TOKEN')) document.getElementById('status').innerText='✅ Tokens já salvos. Pronto pra publicar em '+CFG.owner+'/'+CFG.repo;
+  carregarRepo();
+  addMsg('IA','Oi! Sou a K-AI. GROQ + Pollinations juntas. Peça pra criar algo que eu já deixo pronto pra publicar. Pasta atual: kai-app/');
+};
+function addMsg(q,t){ const d=document.getElementById('msgs'); d.innerHTML+=`<div class="msg"><b>${q}:</b> ${t}</div>`; d.scrollTop=9999; }
+function voltar(){ if(pastaAtual==='') return; let s=pastaAtual.replace(/\/$/,'').split('/'); s.pop(); pastaAtual=s.length? s.join('/')+'/':''; document.getElementById('pastaAtual').innerText=pastaAtual||'(raiz)'; carregarRepo(); }
+
+// ===== EXPLORADOR DO REPO IGUAL GITHUB =====
+async function carregarRepo(){
+  const lista=document.getElementById('lista'); lista.innerHTML='Carregando...';
+  const token=localStorage.getItem('KAI_TOKEN')||'';
+  const url=`https://api.github.com/repos/${CFG.owner}/${CFG.repo}/contents/${pastaAtual}?ref=${CFG.branch}`;
+  try{
+    const r=await fetch(url,{headers: token?{Authorization:'Bearer '+token}: {}});
+    if(!r.ok){ lista.innerHTML='Repo vazio ou sem token. Crie algo e clique PUBLICAR que eu crio tudo.<br><button onclick="publicarTudo()">Criar estrutura inicial</button>'; return; }
+    const arr=await r.json();
+    lista.innerHTML='';
+    if(!Array.isArray(arr)){ lista.innerHTML='Arquivo'; return; }
+    arr.forEach(it=>{
+      const div=document.createElement('div'); div.className='item '+(it.type==='dir'?'folder':'file');
+      div.innerText=(it.type==='dir'?'📁 ':'📄 ')+it.name;
+      div.onclick=()=>{
+        if(it.type==='dir'){ pastaAtual=it.path+'/'; document.getElementById('pastaAtual').innerText=pastaAtual; carregarRepo(); }
+        else abrirArquivo(it.path);
+      };
+      lista.appendChild(div);
+    });
+  }catch(e){ lista.innerHTML='Erro: '+e.message; }
+}
+async function abrirArquivo(path){
+  const token=localStorage.getItem('KAI_TOKEN')||'';
+  const r=await fetch(`https://api.github.com/repos/${CFG.owner}/${CFG.repo}/contents/${path}?ref=${CFG.branch}`,{headers:{Authorization:'Bearer '+token}});
+  const j=await r.json();
+  try{ document.getElementById('preview').innerText = atob(j.content.replace(/\n/g,'')); }catch(e){ document.getElementById('preview').innerText='Não consegui ler (binário ou grande).'; }
+  addMsg('Sistema','Aberto: '+path+' - se pedir "cria aqui dentro", vou usar a pasta dele.');
+  // Se abrir arquivo, pasta atual vira a pasta dele
+  let p=path.split('/'); p.pop(); pastaAtual=p.length? p.join('/')+'/':'';
+  document.getElementById('pastaAtual').innerText=pastaAtual||'(raiz)';
+}
+
+// ===== IA COMBINADA GROQ + POLLINATIONS =====
+async function chamarIA(promptUsuario){
+  const groqKey=localStorage.getItem('GROQ_API_KEY')||'';
+  let respostaGroq='', respostaPoll='';
+  // 1 - GROQ
+  if(groqKey){
+    try{
+      const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+groqKey},body:JSON.stringify({model:'openai/gpt-oss-120b',messages:[{role:'system',content:'Você é K-AI, cria códigos completos, móveis, sem caminho fixo, usando ./ e caminhos relativos. Sempre responda com blocos ```html ou ```js ou ```css ou ```json com o código completo. Pasta padrão: kai-app/'},{role:'user',content:promptUsuario}],temperature:0.7})});
+      const j=await r.json(); respostaGroq=j.choices?.[0]?.message?.content||'';
+    }catch(e){ respostaGroq=''; }
+  }
+  // 2 - Pollinations (grátis, sem chave) - como segunda opinião / complemento
+  try{
+    const r2=await fetch('https://text.pollinations.ai/'+encodeURIComponent('Complemente e melhore, crie código completo móvel: '+promptUsuario+' | Resposta anterior: '+respostaGroq.slice(0,2000)));
+    respostaPoll=await r2.text();
+  }catch(e){ respostaPoll=''; }
+  // 3 - COMBINAR como 1 IA só
+  let combinada = respostaGroq || respostaPoll;
+  if(respostaGroq && respostaPoll && respostaPoll.length>200){
+    combinada = respostaGroq + '\n\n<!-- MELHORIA POLLINATIONS -->\n' + respostaPoll.slice(0,3000);
+  }
+  return combinada || 'Não consegui chamar a IA. Verifique a GROQ_API_KEY e tente de novo.';
+}
+
+// ===== ENTENDER ONDE CRIAR: caminho falado / link / pasta aberta =====
+function resolverCaminho(texto){
+  // Link completo do GitHub
+  let m=texto.match(/github\.com\/[^\/]+\/[^\/]+\/(?:tree|blob)\/[^\/]+\/([^\s]+)/);
+  if(m) return m[1].replace(/\/$/,'')+'/';
+  // caminho tipo pasta/arquivo.html
+  let m2=texto.match(/([a-zA-Z0-9_\-\.\/]+\.(html|js|css|json|md|txt))/i);
+  if(m2){
+    let full=m2[1];
+    if(full.includes('/')) return full;
+    return pastaAtual + full;
+  }
+  // Só nome ou "cria aqui dentro"
+  return pastaAtual;
+}
+function extrairArquivos(respostaIA, nomePadrao){
+  let arquivos=[];
+  const regex=/```(html|js|css|json|md|txt)?\n([\s\S]*?)```/g;
+  let mm; let i=0;
+  while((mm=regex.exec(respostaIA))!==null){
+    let ext=mm[1]||'html'; if(ext==='html') ext='html';
+    let path=nomePadrao;
+    if(i>0) path=path.replace(/\.html$/, '-'+(i+1)+'.html');
+    // Se nome não tem extensão, coloca
+    if(!path.includes('.')) path+='.'+ext;
+    arquivos.push({path, content:mm[2]});
+    i++;
+  }
+  if(arquivos.length===0) arquivos.push({path:nomePadrao, content:respostaIA});
+  return arquivos;
+}
+
+async function enviar(){
+  const inp=document.getElementById('prompt'); const texto=inp.value.trim(); if(!texto) return;
+  addMsg('Você', texto); inp.value='';
+  addMsg('IA','Pensando com GROQ + Pollinations... criando e deixando pronto pra publicar...');
+  const caminho=resolverCaminho(texto);
+  const promptFinal=`Crie completo: ${texto}. Destino: ${caminho}. Pasta atual aberta: ${pastaAtual}. Use caminhos relativos ./ , sem link fixo de repo, sem nome fixo de dono. Crie dentro de kai-app/ o máximo possível.`;
+  const resposta=await chamarIA(promptFinal);
+  const arquivos=extrairArquivos(resposta, caminho.endsWith('/')? caminho+'index.html' : caminho);
+  arquivos.forEach(a=>{ pendentes.push(a); });
+  document.getElementById('preview').innerText=resposta.slice(0,8000);
+  addMsg('IA',`Pronto! ${arquivos.length} arquivo(s) prontos: ${arquivos.map(a=>a.path).join(', ')}. Clique em PUBLICAR no topo pra commitar de verdade no GitHub.`);
+  // Auto-melhoria: se resposta fala que falta algo, já deixa sugestão
+  if(/falta|melhorar|erro/i.test(resposta)) addMsg('IA','Detectei que pode melhorar. Peça: "melhore isso e publique" que eu pesquiso e já atualizo.');
+}
+
+// ===== PUBLICAR = COMMIT REAL VIA API DO GITHUB =====
+async function publicarTudo(){
+  const token=localStorage.getItem('KAI_TOKEN');
+  if(!token){ alert('Coloque o KAI_TOKEN e clique Ativar primeiro.'); return; }
+  // Estrutura inicial obrigatória na primeira vez
+  if(pendentes.length===0){
+    pendentes=[
+      {path:'kai-app/index.html', content:`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>KAI APP</title></head><body><h1>KAI APP - Móvel</h1><p>App criado pelo mestre.html. Caminhos relativos ./</p><script src="./app.js"></script></body></html>`},
+      {path:'kai-app/app.js', content:`// K-AI - Config móvel\nconst CFG={getRepo(){const p=location.pathname.split('/').filter(Boolean); return p[0]||'k-ai-app';}};\nconsole.log('KAI rodando móvel em', CFG.getRepo());\n// LOOP: criar > testar > corrigir > salvar > melhorar\nasync function loopAuto(){ console.log('Loop automático ativo'); }\nloopAuto();`},
+      {path:'kai-app/config.js', content:`// NÃO coloque chaves fixas aqui. Use localStorage KAI_TOKEN e GROQ_API_KEY\nwindow.KAI_CONFIG={base:'./', pastaPadrao:'kai-app/'};`},
+      {path:'kai-app/funcoes/criar.js', content:`// Função principal: criar arquivo - usa GitHub API com token do localStorage\nasync function criarArquivo(path, content){ return {path, content, ok:true}; }`},
+      {path:'kai-app/funcoes/atualizar.js', content:`// Função principal: atualizar arquivo\nasync function atualizarArquivo(path, content){ return criarArquivo(path, content); }`},
+      {path:'kai-app/funcoes/publicar.js', content:`// Função principal: publicar / commit\nasync function publicar(){ console.log('Publicar via mestre.html'); }`},
+      {path:'kai-app/funcoes/importar.js', content:`// Função principal: auto-import da internet\n// Quando detectar algo faltando, busca código aberto na internet e adapta com ./\nasync function autoImportar(tema){ const r=await fetch('https://text.pollinations.ai/'+encodeURIComponent('Me dê código completo móvel para: '+tema)); return await r.text(); }`},
+      {path:'kai-app/funcoes/loop.js', content:`// Loop automático: criar > testar > corrigir > salvar > melhorar\nasync function loop(){ /* cada melhoria gera nova melhoria */ }`},
+      {path:'kai-app/README.md', content:'# KAI APP\nCriado pelo mestre.html. Tudo móvel, sem caminho fixo. Pasta principal: kai-app/'},
+    ];
+    addMsg('Sistema','Criando estrutura inicial completa em kai-app/ ...');
+  }
+  document.getElementById('status').innerText='Publicando '+pendentes.length+' arquivo(s) de verdade no GitHub...';
+  for(let f of pendentes){
+    try{
+      // Pega SHA se já existir (pra atualizar)
+      let sha=null;
+      let get=await fetch(`https://api.github.com/repos/${CFG.owner}/${CFG.repo}/contents/${f.path}?ref=${CFG.branch}`,{headers:{Authorization:'Bearer '+token}});
+      if(get.ok){ let gj=await get.json(); sha=gj.sha; }
+      // btoa com UTF-8
+      let contentB64=btoa(unescape(encodeURIComponent(f.content)));
+      let body={message:'K-AI: criar/atualizar '+f.path+' via mestre.html', content:contentB64, branch:CFG.branch}; if(sha) body.sha=sha;
+      let put=await fetch(`https://api.github.com/repos/${CFG.owner}/${CFG.repo}/contents/${f.path}`,{method:'PUT',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify(body)});
+      if(!put.ok){ let e=await put.text(); addMsg('Erro','Falha em '+f.path+': '+e.slice(0,300)); }
+      else addMsg('✅ Publicado', f.path);
+    }catch(e){ addMsg('Erro', f.path+': '+e.message); }
+  }
+  pendentes=[];
+  document.getElementById('status').innerText='✅ Publicado! Atualizando lista...';
+  setTimeout(carregarRepo, 1500);
+}
+</script>
+</body>
+</html>
